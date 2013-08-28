@@ -26,14 +26,17 @@ int Driver::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &
     
     string msg = IntToMessage(inMsg->destMsgId());
     string src = IntToMachine(inMsg->subjectId());
-    assert(src == "merge");
     switch (_state) {
+        case 0:
+            return 3;
         case 1:
             if( msg == "ABORT" ) {
+                assert(src == "merge");
                 _state = 0 ;
                 return 3;
             }
             else if( msg == "CLEARTOMOVE" ) {
+                assert(src == "merge");
                 _state = 2;
                 return 3;
             }
@@ -42,6 +45,7 @@ int Driver::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &
             break;
         case 2:
             if( msg == "ABORT" ) {
+                assert(src == "merge");
                 _state = 0 ;
                 return 3;
             }

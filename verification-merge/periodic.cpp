@@ -44,7 +44,7 @@ int Periodic::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool
         case 1:
             if( msg == "DEADLINE" ) {
                 int did = inMsg->getParam(1) ;
-                if( did != 1 )
+                if( did != 0 )
                     return 3;
                 
                 if( startIdx == 0 ) {
@@ -56,6 +56,7 @@ int Periodic::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool
                 }
                 else if( startIdx == 1 ) {
                     outMsgs.push_back(toMerge(inMsg, "STOP")) ;
+                    high_prob = false;
                     _state = 0 ;
                     return 3;
                 }
@@ -89,7 +90,7 @@ int Periodic::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool
         case 3:
             if( msg == "DEADLINE" ) {
                 int did = inMsg->getParam(1);
-                if( did == 2 ) {
+                if( did == 1 ) {
                     outMsgs.push_back(toMerge(inMsg, "STOP"));
                     outMsgs.push_back(toFront(inMsg, "STOP"));
                     outMsgs.push_back(toBack(inMsg, "STOP"));

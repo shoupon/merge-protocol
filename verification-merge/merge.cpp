@@ -32,12 +32,12 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs, bool &hi
             if( msg == "SIGNAL" ) {
                 assert(src == "driver") ;
                 // Set D0
-                SyncMessage* d0 = new SyncMessage(inMsg->srcID(),
+                SyncMessage* d1 = new SyncMessage(inMsg->srcID(),
                                                   machineToInt("sync"),
                                                   inMsg->srcMsgId(),
                                                   messageToInt("SET"),
-                                                  macId(), true, 0);
-                outMsgs.push_back(d0) ;
+                                                  macId(), true, 3);
+                outMsgs.push_back(d1) ;
                 MessageTuple* out = new MessageTuple(inMsg->srcID(),
                                                      machineToInt("lock"),
                                                      inMsg->srcMsgId(),
@@ -53,12 +53,12 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs, bool &hi
         case 1:
             if( msg == "SUCCESS" ) {
                 assert(src == "lock") ;
-                SyncMessage* d1 = new SyncMessage(inMsg->srcID(),
+                SyncMessage* d2 = new SyncMessage(inMsg->srcID(),
                                                   machineToInt("sync"),
                                                   inMsg->srcMsgId(),
                                                   messageToInt("SET"),
-                                                  macId(), true, 1) ;
-                outMsgs.push_back(d1) ;
+                                                  macId(), true, 2) ;
+                outMsgs.push_back(d2) ;
                 MessageTuple* out = createOutput(inMsg, machineToInt("periodic"),
                                                  messageToInt("START")) ;
                 outMsgs.push_back(out) ;
@@ -79,7 +79,7 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs, bool &hi
         case 2:
             if( msg == "ENGAGE" ) {
                 assert(src == "periodic") ;
-                MessageTuple* out = createOutput(inMsg, machineToInt("cruise"),
+                MessageTuple* out = createOutput(inMsg, machineToInt("cruise(m)"),
                                                  messageToInt("ALIGN"));
                 outMsgs.push_back(out);
                 _state = 3;
@@ -105,7 +105,9 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs, bool &hi
             }
             else if( msg == "DEADLINE" ) {
                 int did = inMsg->getParam(1) ;
-                assert(did == 1);
+                if(did != 2)
+                    return 2;
+                
                 outMsgs.push_back(createOutput(inMsg, machineToInt("lock"),
                                                messageToInt("UNLOCK")));
                 outMsgs.push_back(createOutput(inMsg, machineToInt("driver"),
@@ -135,7 +137,9 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs, bool &hi
             }
             else if( msg == "DEADLINE") {
                 int did = inMsg->getParam(1);
-                assert(did == 1);
+                if(did != 1)
+                    return 3;
+                
                 outMsgs.push_back(createOutput(inMsg, machineToInt("driver"),
                                                messageToInt("ABORT"))) ;
                 outMsgs.push_back(createOutput(inMsg, machineToInt("cruise"),

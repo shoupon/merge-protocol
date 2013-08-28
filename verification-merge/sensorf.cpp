@@ -17,7 +17,10 @@ SensorF::SensorF(Lookup* msg, Lookup* mac ):StateMachine(msg, mac)
 int SensorF::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &high_prob,
                      int startIdx)
 {
-    return -1;
+    if( startIdx == 0 )
+        return 3;
+    else
+        return -1;
 }
 
 int SensorF::nullInputTrans(vector<MessageTuple *> &outMsgs, bool &high_prob, int startIdx)

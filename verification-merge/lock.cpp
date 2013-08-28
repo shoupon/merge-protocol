@@ -36,12 +36,34 @@ int Lock::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &hi
             }
             break;
         case 1:
+            if( msg == "UNLOCK" ) {
+                MessageTuple* msg2merge = new MessageTuple(inMsg->srcID(),
+                                                           machineToInt("merge"),
+                                                           inMsg->srcMsgId(),
+                                                           messageToInt("FREE"),
+                                                           macId()) ;
+                MessageTuple* msg2front = new MessageTuple(inMsg->srcID(),
+                                                           machineToInt("front"),
+                                                           inMsg->srcMsgId(),
+                                                           messageToInt("FREE"),
+                                                           macId()) ;
+                MessageTuple* msg2back = new MessageTuple(inMsg->srcID(),
+                                                          machineToInt("back"),
+                                                          inMsg->srcMsgId(),
+                                                          messageToInt("FREE"),
+                                                          macId()) ;
+                outMsgs.push_back(msg2merge) ;
+                outMsgs.push_back(msg2front);
+                outMsgs.push_back(msg2back);
+                _state = 0 ;
+                return 3;
+            }
             return 3;
             break ;
-        case 2: 
-            if( msg == "DEADLINE") {
+        case 2:
+            if( msg == "DEADLINE" ) {
                 int did = inMsg->getParam(1);
-                if( did == 0 ) {
+                if( did == 3 ) {
                     MessageTuple* msg2merge = new MessageTuple(inMsg->srcID(),
                                                                machineToInt("merge"),
                                                                inMsg->srcMsgId(),
@@ -65,14 +87,30 @@ int Lock::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &hi
                 }
                 else
                     return 3;
+            }
+            else if( msg == "UNLOCK" ) {
+                MessageTuple* msg2front = new MessageTuple(inMsg->srcID(),
+                                                           machineToInt("front"),
+                                                           inMsg->srcMsgId(),
+                                                           messageToInt("FREE"),
+                                                           macId()) ;
+                MessageTuple* msg2back = new MessageTuple(inMsg->srcID(),
+                                                          machineToInt("back"),
+                                                          inMsg->srcMsgId(),
+                                                          messageToInt("FREE"),
+                                                          macId()) ;
+                outMsgs.push_back(msg2front );
+                outMsgs.push_back(msg2back);
+                _state = 0 ;
+                return 3;
             }
             else
                 return 3;
                 break ;
         case 3:
-            if( msg == "DEADLINE") {
+            if( msg == "DEADLINE"  ) {
                 int did = inMsg->getParam(1);
-                if( did == 0 ) {
+                if( did == 3 ) {
                     MessageTuple* msg2merge = new MessageTuple(inMsg->srcID(),
                                                                machineToInt("merge"),
                                                                inMsg->srcMsgId(),
@@ -91,13 +129,23 @@ int Lock::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &hi
                 else
                     return 3;
             }
+            else if( msg == "UNLOCK" ) {
+                MessageTuple* msg2front = new MessageTuple(inMsg->srcID(),
+                                                           machineToInt("front"),
+                                                           inMsg->srcMsgId(),
+                                                           messageToInt("FREE"),
+                                                           macId()) ;
+                outMsgs.push_back(msg2front );
+                _state = 0 ;
+                return 3;
+            }
             else
                 return 3;
             break ;
         case 4:
-            if( msg == "DEADLINE") {
+            if( msg == "DEADLINE" ) {
                 int did = inMsg->getParam(1);
-                if( did == 0 ) {
+                if( did == 3 ) {
                     MessageTuple* msg2merge = new MessageTuple(inMsg->srcID(),
                                                                machineToInt("merge"),
                                                                inMsg->srcMsgId(),
@@ -116,13 +164,23 @@ int Lock::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &hi
                 else
                     return 3;
             }
+            else if( msg == "UNLOCK" ) {
+                MessageTuple* msg2back = new MessageTuple(inMsg->srcID(),
+                                                          machineToInt("back"),
+                                                          inMsg->srcMsgId(),
+                                                          messageToInt("FREE"),
+                                                          macId()) ;
+                outMsgs.push_back(msg2back );
+                _state = 0 ;
+                return 3;
+            }
             else
                 return 3;
             break ;
         case 5:
-            if( msg == "DEADLINE") {
+            if( msg == "DEADLINE" || msg == "UNLOCK" ) {
                 int did = inMsg->getParam(1);
-                if( did == 0 ) {
+                if( did == 3 ) {
                     MessageTuple* msg2merge = new MessageTuple(inMsg->srcID(),
                                                                machineToInt("merge"),
                                                                inMsg->srcMsgId(),
