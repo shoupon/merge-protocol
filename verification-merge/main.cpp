@@ -18,7 +18,17 @@ using namespace std;
 #include "define.h"
 #include "sync.h"
 
+#include "merge.h"
+#include "front.h"
+#include "back.h"
+#include "lock.h"
+#include "periodic.h"
+#include "coordinatedsensor.h"
+#include "sensorf.h"
 #include "cruise.h"
+#include "driver.h"
+
+#include "mergechecker.h"
 
 ProbVerifier pvObj ;
 GlobalState* startPoint;
@@ -60,31 +70,23 @@ int main( int argc, char* argv[] )
         Sync* sync = new Sync(nParty, psrPtr->getMsgTable(), psrPtr->getMacTable() );
         pvObj.addMachine(sync);
         
-        Coordinator* coord = new Coordinator(psrPtr->getMsgTable(), psrPtr->getMacTable()) ;
-        pvObj.addMachine(coord) ;
+        Merge* merge = new Merge(psrPtr->getMsgTable(), psrPtr->getMacTable() );
+        Front* front = new Front(psrPtr->getMsgTable(), psrPtr->getMacTable() );
+        Back* back = new Back(psrPtr->getMsgTable(), psrPtr->getMacTable() );
+        pvObj.addMachine(merge);
+        pvObj.addMachine(front);
+        pvObj.addMachine(back);
+        sync->setMaster(merge);
+        sync->addMachine(front);
+        sync->addMachine(back);
         
-        Cohort** cohorts = new Cohort*[nSlaves] ;
-        for( int i = 1; i <= nSlaves ; ++i ) {
-            Cohort* coho = new Cohort(i, psrPtr->getMsgTable(), psrPtr->getMacTable()) ;
-            pvObj.addMachine(coho) ;
-            cohorts[i-1] = coho ;
-        }
+        Lock* lock = new Lock(psrPtr->getMsgTable(), psrPtr->getMacTable()) ;
+        pvObj.addMachine(lock);
+        sync->addMachine(lock);
         
-        Master* mstr = new Master(nParty,psrPtr->getMsgTable(),psrPtr->getMacTable());
-        pvObj.addMachine(mstr) ;
-        sync->setMaster(mstr) ;
-        
-        Slave** slaves = new Slave*[nSlaves] ;
-        for( int i = 1 ; i <= nSlaves ; ++i ) {
-            Slave* slav = new Slave(nParty,i,
-                                    psrPtr->getMsgTable(),psrPtr->getMacTable());
-            pvObj.addMachine(slav) ;
-            sync->addMachine(slav) ;
-            slaves[i-1] = slav ;
-        }
-        Channel* chan = new Channel(nParty, psrPtr->getMsgTable(), psrPtr->getMacTable()) ;
-        pvObj.addMachine(chan);
-        sync->addMachine(chan) ;
+        Periodic* period = new Periodic(psrPtr->getMsgTable(), psrPtr->getMacTable());
+        pvObj.addMachine(period);
+        sync->addMachine(period);
         
         Cruise* iccm = new Cruise(psrPtr->getMsgTable(), psrPtr->getMacTable(),
                                   "merge", "m", "ALIGN");
@@ -99,33 +101,46 @@ int main( int argc, char* argv[] )
         sync->addMachine(iccf);
         sync->addMachine(iccb);
         
+        CoordinatedSensor* coord = new CoordinatedSensor(psrPtr->getMsgTable(),
+                                                         psrPtr->getMacTable() );
+        pvObj.addMachine(coord);
+        sync->addMachine(coord);
+        
+        SensorF* sensf = new SensorF(psrPtr->getMsgTable(), psrPtr->getMacTable() );
+        pvObj.addMachine(sensf);
+        sync->addMachine(sensf);
+        
+        Driver* driver = new Driver(psrPtr->getMsgTable(), psrPtr->getMacTable());
+        pvObj.addMachine(driver);
+        sync->addMachine(driver);
+        
         // Initialize SecureChecker
-        SecureChecker secChk(nSlaves);
-        SecureCheckerState secChkState;
+        MergeChecker mergeChk;
+        MergeCheckerState mergeChkState;
         
         // Add checker into ProbVerifier
-        pvObj.addChecker(&secChk);
+        pvObj.addChecker(&mergeChk);
         
         // Specify the starting state
-        GlobalState* startPoint = new GlobalState(pvObj.getMachinePtrs(), &secChkState);
+        GlobalState* startPoint = new GlobalState(pvObj.getMachinePtrs(), &mergeChkState);
         startPoint->setParser(psrPtr);
         
         // Specify the global states in the set RS (stopping states)
         // initial state: master = 0, slave = 0
         
         StoppingState stop1(startPoint);
-        stop1.addAllow(new NodeSnapshot(0), 1) ;   // coordinator
-        stop1.addAllow(new NodeSnapshot(0), 2) ;   // cohort 1
-        stop1.addAllow(new NodeSnapshot(0), 3) ;   // cohort 2
-        stop1.addAllow(new NodeSnapshot(0), 4) ;   // cohort 3
+        stop1.addAllow(new StateSnapshot(0), 1) ;    // merge
+        stop1.addAllow(new StateSnapshot(0), 2) ;    // front
+        stop1.addAllow(new StateSnapshot(0), 3) ;    // back
+        stop1.addAllow(new StateSnapshot(0), 4) ;    // lock
+        stop1.addAllow(new StateSnapshot(0), 5) ;    // periodic
+        stop1.addAllow(new StateSnapshot(0), 6) ;    // icc merge
+        stop1.addAllow(new StateSnapshot(0), 7) ;    // icc front
+        stop1.addAllow(new StateSnapshot(0), 8) ;    // icc back
+        stop1.addAllow(new StateSnapshot(0), 9) ;    // coord sensor
+        stop1.addAllow(new StateSnapshot(0), 10) ;   // sensor front
+        stop1.addAllow(new StateSnapshot(0), 11) ;   // driver
         pvObj.addSTOP(&stop1);
-        
-        StoppingState stop2(startPoint);
-        stop1.addAllow(new NodeSnapshot(2), 1) ;   // coordinator
-        stop1.addAllow(new NodeSnapshot(1), 2) ;   // cohort 1
-        stop1.addAllow(new NodeSnapshot(1), 3) ;   // cohort 2
-        stop1.addAllow(new NodeSnapshot(1), 4) ;   // cohort 3
-        pvObj.addSTOP(&stop2);
         
         // Specify the error states
         // One of the slaves is not locked
@@ -145,17 +160,20 @@ int main( int argc, char* argv[] )
         
         // When complete, deallocate all machines
         delete sync ;
-        delete mstr ;
+        delete merge;
+        delete front;
+        delete back;
+        delete lock;
+        delete period;
+        delete iccm;
+        delete iccf ;
+        delete iccb;
         delete coord;
-        for( int i = 0 ; i < nSlaves ; ++i ) {
-            delete slaves[i] ;
-            delete cohorts[i];
-        }
-        delete[] slaves ;
-        delete[] cohorts;
-        delete chan ;
+        delete sensf ;
         
         delete startPoint;
+        
+        delete psrPtr;
         
     } catch( runtime_error& re ) {
         cerr << "Runtime error:" << endl
