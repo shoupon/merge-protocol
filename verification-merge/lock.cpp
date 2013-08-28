@@ -34,6 +34,8 @@ int Lock::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &hi
                 _state = 1;
                 return 3;
             }
+            else
+                return 3;
             break;
         case 1:
             if( msg == "UNLOCK" ) {
