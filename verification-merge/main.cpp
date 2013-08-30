@@ -52,7 +52,7 @@ bool printStop(GlobalState* left, GlobalState* right)
      }
      else
      return false;*/
-    return false;
+    return true;
 }
 
 int nSlaves = 3;
@@ -126,8 +126,7 @@ int main( int argc, char* argv[] )
         startPoint->setParser(psrPtr);
         
         // Specify the global states in the set RS (stopping states)
-        // initial state: master = 0, slave = 0
-        
+        // initial state
         StoppingState stop1(startPoint);
         stop1.addAllow(new StateSnapshot(0), 1) ;    // merge
         stop1.addAllow(new StateSnapshot(0), 2) ;    // front
@@ -142,6 +141,111 @@ int main( int argc, char* argv[] )
         stop1.addAllow(new StateSnapshot(0), 11) ;   // driver
         pvObj.addSTOP(&stop1);
         
+        StoppingState stop2(startPoint);
+        stop2.addAllow(new StateSnapshot(2), 4);     // lock
+        stop2.addAllow(new StateSnapshot(2), 5);     // periodic
+        stop2.addAllow(new StateSnapshot(1), 6) ;    // icc merge
+        stop2.addAllow(new StateSnapshot(1), 7) ;    // icc front
+        stop2.addAllow(new StateSnapshot(1), 8) ;    // icc back
+        stop2.addAllow(new StateSnapshot(2), 11);    // driver
+        pvObj.addSTOP(&stop2);
+        
+        // Driver is notified clear_to_move, but the gap is not ready yet
+        StoppingState err1a(startPoint);
+        err1a.addAllow(new StateSnapshot(2), 11);     // driver
+        err1a.addAllow(new StateSnapshot(0), 9);      // coord sensor
+        pvObj.addError(&err1a);
+        
+        StoppingState err1b(startPoint);
+        err1b.addAllow(new StateSnapshot(2), 11);     // driver
+        err1b.addAllow(new StateSnapshot(1), 9);      // coord sensor
+        pvObj.addError(&err1b);
+        
+        // When emergency is detected, cruise control is not reset
+        StoppingState err2a(startPoint);
+        err2a.addAllow(new StateSnapshot(1), 10);    // sensor front
+        err2a.addAllow(new StateSnapshot(1), 6);     // icc merge
+        pvObj.addError(&err2a);
+
+        StoppingState err2b(startPoint);
+        err2b.addAllow(new StateSnapshot(1), 10);    // sensor front
+        err2b.addAllow(new StateSnapshot(1), 7);     // icc front
+        pvObj.addError(&err2b);
+        
+        StoppingState err2c(startPoint);
+        err2c.addAllow(new StateSnapshot(1), 10);    // sensor front
+        err2c.addAllow(new StateSnapshot(1), 8);     // icc back
+        pvObj.addError(&err2c);
+        
+        // Driver is not notified when emergency takes place
+        StoppingState err3a(startPoint);
+        err3a.addAllow(new StateSnapshot(1), 10);    // sensor front
+        err3a.addAllow(new StateSnapshot(1), 11);    // driver
+        pvObj.addError(&err3a);
+        
+        StoppingState err3b(startPoint);
+        err3b.addAllow(new StateSnapshot(1), 10);    // sensor front
+        err3b.addAllow(new StateSnapshot(2), 11);    // driver
+        pvObj.addError(&err3b);
+        
+        // Driver is changing lanes but either the periodic update or the lock protocol
+        // is not operating
+        StoppingState err4a(startPoint);
+        err4a.addAllow(new StateSnapshot(2), 11);    // driver
+        err4a.addAllow(new StateSnapshot(0), 5);     // periodic
+        pvObj.addError(&err4a);
+        
+        StoppingState err4b(startPoint);
+        err4b.addAllow(new StateSnapshot(2), 11);    // driver
+        err4b.addAllow(new StateSnapshot(1), 5);     // periodic
+        pvObj.addError(&err4b);
+        
+        StoppingState err4c(startPoint);
+        err4c.addAllow(new StateSnapshot(2), 11);    // driver
+        err4c.addAllow(new StateSnapshot(3), 5);     // periodic
+        pvObj.addError(&err4c);
+        
+        StoppingState err4d(startPoint);
+        err4d.addAllow(new StateSnapshot(2), 11);    // driver
+        err4d.addAllow(new StateSnapshot(0), 4);     // lock
+        pvObj.addError(&err4d);
+
+        StoppingState err4e(startPoint);
+        err4e.addAllow(new StateSnapshot(2), 11);    // driver
+        err4e.addAllow(new StateSnapshot(1), 4);     // lock
+        pvObj.addError(&err4e);
+        
+        StoppingState err4f(startPoint);
+        err4f.addAllow(new StateSnapshot(2), 11);    // driver
+        err4f.addAllow(new StateSnapshot(3), 4);     // lock
+        pvObj.addError(&err4f);
+
+        StoppingState err4g(startPoint);
+        err4g.addAllow(new StateSnapshot(2), 11);    // driver
+        err4g.addAllow(new StateSnapshot(4), 4);     // lock
+        pvObj.addError(&err4g);
+
+        StoppingState err4h(startPoint);
+        err4h.addAllow(new StateSnapshot(2), 11);    // driver
+        err4h.addAllow(new StateSnapshot(5), 4);     // lock
+        pvObj.addError(&err4h);
+        
+        // Driver is cleared to move but the cruise control is reset
+        StoppingState err5a(startPoint);
+        err5a.addAllow(new StateSnapshot(2), 11);    // driver
+        err5a.addAllow(new StateSnapshot(0), 6);     // icc merge
+        pvObj.addError(&err5a);
+
+        StoppingState err5b(startPoint);
+        err5b.addAllow(new StateSnapshot(2), 11);    // driver
+        err5b.addAllow(new StateSnapshot(0), 7);     // icc front
+        pvObj.addError(&err5b);
+        
+        StoppingState err5c(startPoint);
+        err5c.addAllow(new StateSnapshot(2), 11);    // driver
+        err5c.addAllow(new StateSnapshot(0), 8);     // icc back
+        pvObj.addError(&err5c);
+        
         // Specify the error states
         // One of the slaves is not locked
         /*
@@ -152,7 +256,6 @@ int main( int argc, char* argv[] )
          */
         
         pvObj.addPrintStop(printStop) ;
-        //pvObj.addPrintStop();
         
         // Start the procedure of probabilistic verification.
         // Specify the maximum probability depth to be explored
