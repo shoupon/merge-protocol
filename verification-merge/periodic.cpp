@@ -33,7 +33,7 @@ int Periodic::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool
                                                   machineToInt("sync"),
                                                   inMsg->srcMsgId(),
                                                   messageToInt("SET"),
-                                                  macId(), true, 1);
+                                                  macId(), true, 0);
                 outMsgs.push_back(dm) ;
                 _state = 1;
                 return 3;
@@ -80,7 +80,7 @@ int Periodic::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool
                                                    machineToInt("sync"),
                                                    inMsg->srcMsgId(),
                                                    messageToInt("SET"),
-                                                   macId(), true, 2);
+                                                   macId(), true, 1);
                 outMsgs.push_back(dmp) ;
                 _state = 3;
                 return 3;

@@ -31,19 +31,6 @@ int Lock::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &hi
         case 0:
             if( msg == "ATTEMPT" ) {
                 assert(src == "merge");
-                _state = 1;
-                return 3;
-            }
-            else
-                return 3;
-            break;
-        case 1:
-            if( msg == "UNLOCK" ) {
-                MessageTuple* msg2merge = new MessageTuple(inMsg->srcID(),
-                                                           machineToInt("merge"),
-                                                           inMsg->srcMsgId(),
-                                                           messageToInt("FREE"),
-                                                           macId()) ;
                 MessageTuple* msg2front = new MessageTuple(inMsg->srcID(),
                                                            machineToInt("front"),
                                                            inMsg->srcMsgId(),
@@ -54,10 +41,25 @@ int Lock::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &hi
                                                           inMsg->srcMsgId(),
                                                           messageToInt("FREE"),
                                                           macId()) ;
-                outMsgs.push_back(msg2merge) ;
                 outMsgs.push_back(msg2front);
                 outMsgs.push_back(msg2back);
+                _state = 1;
+                return 3;
+            }
+            else
+                return 3;
+            break;
+        case 1:
+            if( msg == "UNLOCK" ) {
+                assert(src == "merge");
                 _state = 0 ;
+                return 3;
+            }
+            else if( msg == "DEADLINE") {
+                int did = inMsg->getParam(1);
+                assert(did == 3);
+                _state = 0 ;
+                high_prob = false;
                 return 3;
             }
             return 3;
@@ -91,6 +93,7 @@ int Lock::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &hi
                     return 3;
             }
             else if( msg == "UNLOCK" ) {
+                assert(src == "merge");
                 MessageTuple* msg2front = new MessageTuple(inMsg->srcID(),
                                                            machineToInt("front"),
                                                            inMsg->srcMsgId(),
@@ -132,6 +135,7 @@ int Lock::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &hi
                     return 3;
             }
             else if( msg == "UNLOCK" ) {
+                assert(src == "merge");
                 MessageTuple* msg2front = new MessageTuple(inMsg->srcID(),
                                                            machineToInt("front"),
                                                            inMsg->srcMsgId(),
@@ -167,6 +171,7 @@ int Lock::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &hi
                     return 3;
             }
             else if( msg == "UNLOCK" ) {
+                assert(src == "merge");
                 MessageTuple* msg2back = new MessageTuple(inMsg->srcID(),
                                                           machineToInt("back"),
                                                           inMsg->srcMsgId(),
@@ -216,10 +221,10 @@ int Lock::nullInputTrans(vector<MessageTuple *> &outMsgs, bool &high_prob, int s
                                                            0, messageToInt("SUCCESS"),
                                                            macId()) ;
                 MessageTuple* msg2front = new MessageTuple(0, machineToInt("front"),
-                                                           0, messageToInt("COOP"),
+                                                           0, messageToInt("COOPERATE"),
                                                            macId()) ;
                 MessageTuple* msg2back = new MessageTuple(0, machineToInt("back"),
-                                                           0, messageToInt("COOP"),
+                                                           0, messageToInt("COOPERATE"),
                                                            macId()) ;
                 outMsgs.push_back(msg2merge);
                 outMsgs.push_back(msg2front);
@@ -229,7 +234,7 @@ int Lock::nullInputTrans(vector<MessageTuple *> &outMsgs, bool &high_prob, int s
             }
             else if( startIdx == 1 ) {
                 MessageTuple* msg2front = new MessageTuple(0, machineToInt("front"),
-                                                           0, messageToInt("COOP"),
+                                                           0, messageToInt("COOPERATE"),
                                                            macId()) ;
                 outMsgs.push_back(msg2front);
                 _state = 3 ;
@@ -238,7 +243,7 @@ int Lock::nullInputTrans(vector<MessageTuple *> &outMsgs, bool &high_prob, int s
             }
             else if( startIdx == 2 ) {
                 MessageTuple* msg2back = new MessageTuple(0, machineToInt("back"),
-                                                          0, messageToInt("COOP"),
+                                                          0, messageToInt("COOPERATE"),
                                                           macId()) ;
                 outMsgs.push_back(msg2back);
                 _state = 4 ;
@@ -247,6 +252,7 @@ int Lock::nullInputTrans(vector<MessageTuple *> &outMsgs, bool &high_prob, int s
             }
             else if( startIdx == 3 ) {
                 _state = 5;
+                high_prob = false;
                 return 4;
             }
             else
