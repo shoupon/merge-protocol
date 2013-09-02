@@ -11,8 +11,8 @@
 
 #include <iostream>
 
-#include "statemachine.h"
-#include "sync.h"
+#include "../prob_verify/statemachine.h"
+#include "../prob_verify/sync.h"
 
 class PeriodicSnapshot;
 

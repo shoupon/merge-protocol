@@ -13,8 +13,8 @@
 #include <vector>
 using namespace std;
 
-#include "statemachine.h"
-#include "checker.h"
+#include "../prob_verify/statemachine.h"
+#include "../prob_verify/checker.h"
 
 class MergeChecker;
 

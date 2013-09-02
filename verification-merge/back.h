@@ -11,7 +11,7 @@
 
 #include <iostream>
 
-#include "statemachine.h"
+#include "../prob_verify/statemachine.h"
 
 class Back: public StateMachine
 {

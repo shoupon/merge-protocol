@@ -13,7 +13,7 @@
 #include <sstream>
 
 #include "merge.h"
-#include "statemachine.h"
+#include "../prob_verify/statemachine.h"
 
 
 class LockSnapshot;
