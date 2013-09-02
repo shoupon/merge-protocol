@@ -67,6 +67,7 @@ int main( int argc, char* argv[] )
         // Create StateMachine objects
         // Add the state machines into ProbVerifier
         // Register the machines that are triggered by deadline (sync)
+        StateMachine::setLookup(psrPtr->getMsgTable(), psrPtr->getMacTable()) ;
         Sync* sync = new Sync(nParty, psrPtr->getMsgTable(), psrPtr->getMacTable() );
         pvObj.addMachine(sync);
         

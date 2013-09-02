@@ -63,6 +63,14 @@ int Periodic::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool
                 else
                     return -1;
             }
+            else if( msg == "END" ) {
+                assert(src == "merge");
+                outMsgs.push_back(toFront(inMsg, "STOP"));
+                outMsgs.push_back(toBack(inMsg, "STOP"));
+                outMsgs.push_back(Sync::revokeDeadline(inMsg, macId(), 0));
+                _state = 0;
+                return 3;
+            }
             else
                 return 3;
             break;
@@ -76,12 +84,7 @@ int Periodic::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool
             }
             else if( msg == "DISENGAGE" ) {
                 assert(src == "front");
-                SyncMessage* dmp = new SyncMessage(inMsg->srcID(),
-                                                   machineToInt("sync"),
-                                                   inMsg->srcMsgId(),
-                                                   messageToInt("SET"),
-                                                   macId(), true, 1);
-                outMsgs.push_back(dmp) ;
+                outMsgs.push_back(Sync::setDeadline(inMsg, macId(), 1)) ;   // Dm'
                 _state = 3;
                 return 3;
             }

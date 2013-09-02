@@ -93,6 +93,7 @@ int Front::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &h
                                                    messageToInt("DISENGAGE"),
                                                    macId()));
                 _state = 5;
+                return 3;
             }
             else
                 return 3;

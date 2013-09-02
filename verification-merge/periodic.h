@@ -12,6 +12,7 @@
 #include <iostream>
 
 #include "statemachine.h"
+#include "sync.h"
 
 class PeriodicSnapshot;
 

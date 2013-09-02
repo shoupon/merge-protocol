@@ -57,7 +57,9 @@ int Lock::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &hi
             }
             else if( msg == "DEADLINE") {
                 int did = inMsg->getParam(1);
-                assert(did == 3);
+                if(did != 3){
+                    return 3;
+                }
                 _state = 0 ;
                 high_prob = false;
                 return 3;
@@ -104,7 +106,7 @@ int Lock::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &hi
                                                           inMsg->srcMsgId(),
                                                           messageToInt("FREE"),
                                                           macId()) ;
-                outMsgs.push_back(msg2front );
+                outMsgs.push_back(msg2front);
                 outMsgs.push_back(msg2back);
                 _state = 0 ;
                 return 3;

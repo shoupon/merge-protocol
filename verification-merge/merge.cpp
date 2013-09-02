@@ -79,9 +79,12 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs, bool &hi
         case 2:
             if( msg == "ENGAGE" ) {
                 assert(src == "periodic") ;
-                MessageTuple* out = createOutput(inMsg, machineToInt("cruise(m)"),
-                                                 messageToInt("ALIGN"));
-                outMsgs.push_back(out);
+                MessageTuple* cout = createOutput(inMsg, machineToInt("cruise(m)"),
+                                                  messageToInt("ALIGN"));
+                MessageTuple* sout = createOutput(inMsg, machineToInt("coordsensor"),
+                                                  messageToInt("MONITOR"));
+                outMsgs.push_back(cout);
+                outMsgs.push_back(sout);
                 _state = 3;
                 return 3;
             }
@@ -106,7 +109,7 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs, bool &hi
             else if( msg == "DEADLINE" ) {
                 int did = inMsg->getParam(1) ;
                 if(did != 2)
-                    return 2;
+                    return 3;
                 
                 outMsgs.push_back(createOutput(inMsg, machineToInt("lock"),
                                                messageToInt("UNLOCK")));
@@ -120,7 +123,7 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs, bool &hi
             break;
         case 3:
             if( msg == "READY" ) {
-                assert(src == "sensor") ;
+                assert(src == "coordsensor") ;
                 outMsgs.push_back(createOutput(inMsg, machineToInt("driver"),
                                                messageToInt("CLEARTOMOVE"))) ;
                 _state = 4;
