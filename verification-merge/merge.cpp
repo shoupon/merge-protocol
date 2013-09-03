@@ -7,8 +7,8 @@
 //
 
 #include "merge.h"
-#include "sync.h"
-#include "statemachine.h"
+#include "../prob_verify/sync.h"
+#include "../prob_verify/statemachine.h"
 
 Merge::Merge( Lookup* msg, Lookup* mac ): StateMachine(msg, mac)
 {
@@ -133,21 +133,24 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs, bool &hi
                 assert(src == "periodic");
                 outMsgs.push_back(createOutput(inMsg, machineToInt("driver"),
                                                messageToInt("ABORT"))) ;
-                outMsgs.push_back(createOutput(inMsg, machineToInt("cruise"),
+                outMsgs.push_back(createOutput(inMsg, machineToInt("cruise(m)"),
                                                messageToInt("RESET"))) ;
+                outMsgs.push_back(createOutput(inMsg, machineToInt("coordsensor"),
+                                               messageToInt("STOP")));
                 _state = 5;
                 return 3;
             }
-            else if( msg == "DEADLINE") {
-                int did = inMsg->getParam(1);
-                if(did != 1)
-                    return 3;
-                
+            else if( msg == "FREE" ) {
+                assert(src == "lock");
+                outMsgs.push_back(createOutput(inMsg, machineToInt("periodic"),
+                                               messageToInt("END")));
                 outMsgs.push_back(createOutput(inMsg, machineToInt("driver"),
-                                               messageToInt("ABORT"))) ;
-                outMsgs.push_back(createOutput(inMsg, machineToInt("cruise"),
-                                               messageToInt("RESET"))) ;
-                _state = 5;
+                                               messageToInt("ABORT")));
+                outMsgs.push_back(createOutput(inMsg, machineToInt("cruise(m)"),
+                                               messageToInt("RESET")));
+                outMsgs.push_back(createOutput(inMsg, machineToInt("coordsensor"),
+                                               messageToInt("STOP")));
+                _state = 0 ;
                 return 3;
             }
             else
@@ -156,7 +159,7 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs, bool &hi
         case 4:
             if( msg == "COMPLETE" ) {
                 assert(src == "driver") ;
-                outMsgs.push_back(createOutput(inMsg, machineToInt("cruise"),
+                outMsgs.push_back(createOutput(inMsg, machineToInt("cruise(m)"),
                                                messageToInt("RESET"))) ;
                 outMsgs.push_back(createOutput(inMsg, machineToInt("lock"),
                                                messageToInt("UNLOCK"))) ;
@@ -169,10 +172,12 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs, bool &hi
                 assert(src == "lock" );
                 outMsgs.push_back(createOutput(inMsg, machineToInt("driver"),
                                                messageToInt("ABORT")));
-                outMsgs.push_back(createOutput(inMsg, machineToInt("cruise"),
+                outMsgs.push_back(createOutput(inMsg, machineToInt("cruise(m)"),
                                                messageToInt("RESET"))) ;
                 outMsgs.push_back(createOutput(inMsg, machineToInt("periodic"),
                                                messageToInt("END")));
+                outMsgs.push_back(createOutput(inMsg, machineToInt("coordsensor"),
+                                               messageToInt("STOP")));
                 _state = 0 ;
                 return 3;
             }
@@ -180,6 +185,8 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs, bool &hi
                 assert(src == "periodic");
                 outMsgs.push_back(createOutput(inMsg, machineToInt("driver"),
                                                messageToInt("ABORT"))) ;
+                outMsgs.push_back(createOutput(inMsg, machineToInt("coordsensor"),
+                                               messageToInt("STOP")));
                 _state = 5;
                 return 3 ;
             }
@@ -189,8 +196,10 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs, bool &hi
         case 5:
             if( msg == "FREE") {
                 assert(src == "lock") ;
-                outMsgs.push_back(createOutput(inMsg, machineToInt("cruise"),
+                outMsgs.push_back(createOutput(inMsg, machineToInt("cruise(m)"),
                                                messageToInt("RESET"))) ;
+                outMsgs.push_back(createOutput(inMsg, machineToInt("coordsensor"),
+                                               messageToInt("STOP")));
                 _state = 0 ;
                 return 3;
             }

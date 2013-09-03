@@ -34,11 +34,19 @@ int CoordinatedSensor::transit(MessageTuple *inMsg, vector<MessageTuple *> &outM
             return 3;
             break;
         case 1:
+            if( msg == "STOP") {
+                assert(src == "merge") ;
+                _state = 0 ;
+            }
             return 3;
             break;
         case 2:
             if( msg == "COMPLETE" ) {
                 assert(src == "driver");
+                _state = 0 ;
+            }
+            else if( msg == "STOP") {
+                assert(src == "merge") ;
                 _state = 0 ;
             }
             return 3;

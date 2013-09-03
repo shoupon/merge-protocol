@@ -12,11 +12,10 @@
 #include <stdexcept>
 using namespace std;
 
-#include "parser.h"
-#include "fsm.h"
-#include "pverify.h"
-#include "define.h"
-#include "sync.h"
+#include "../prob_verify/parser.h"
+#include "../prob_verify/pverify.h"
+#include "../prob_verify/define.h"
+#include "../prob_verify/sync.h"
 
 #include "merge.h"
 #include "front.h"

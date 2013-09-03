@@ -7,7 +7,7 @@
 //
 
 #include "lock.h"
-#include "statemachine.h"
+#include "../prob_verify/statemachine.h"
 
 
 Lock::Lock( Lookup* msg, Lookup* mac ): StateMachine(msg, mac)

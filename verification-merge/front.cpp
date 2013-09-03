@@ -71,6 +71,16 @@ int Front::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &h
                 _state = 4 ;
                 return 3;
             }
+            else if( msg == "FREE" ) {
+                assert(src == "lock");
+                outMsgs.push_back(new MessageTuple(inMsg->srcID(),
+                                                   machineToInt("cruise(f)"),
+                                                   inMsg->srcMsgId(),
+                                                   messageToInt("RESET"),
+                                                   macId()));
+                _state = 0 ;
+                return 3;
+            }
             else
                 return 3;
             break;

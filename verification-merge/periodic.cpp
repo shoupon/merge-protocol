@@ -7,7 +7,7 @@
 //
 
 #include "periodic.h"
-#include "sync.h"
+#include "../prob_verify/sync.h"
 
 Periodic::Periodic( Lookup* msg, Lookup* mac ):StateMachine(msg, mac)
 {
