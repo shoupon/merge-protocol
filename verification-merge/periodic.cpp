@@ -23,18 +23,15 @@ int Periodic::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool
     string msg = IntToMessage(inMsg->destMsgId());
     string src = IntToMachine(inMsg->subjectId());
     
-    if( startIdx >= 3 )
+    if( startIdx != 0 )
         return -1;
     switch (_state) {
         case 0:
             if( msg == "START" ) {
                 assert(src == "merge");
-                SyncMessage* dm = new SyncMessage(inMsg->srcID(),
-                                                  machineToInt("sync"),
-                                                  inMsg->srcMsgId(),
-                                                  messageToInt("SET"),
-                                                  macId(), true, 0);
-                outMsgs.push_back(dm) ;
+                outMsgs.push_back(toMerge(inMsg, "ENGAGE"));
+                outMsgs.push_back(toFront(inMsg, "ENGAGE"));
+                outMsgs.push_back(toBack(inMsg, "ENGAGE"));
                 _state = 1;
                 return 3;
             }
@@ -42,69 +39,24 @@ int Periodic::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool
                 return 3;
             break;
         case 1:
-            if( msg == "DEADLINE" ) {
-                int did = inMsg->getParam(1) ;
-                if( did != 0 )
-                    return 3;
-                
-                if( startIdx == 0 ) {
-                    outMsgs.push_back(toMerge(inMsg, "ENGAGE"));
-                    outMsgs.push_back(toFront(inMsg, "ENGAGE"));
-                    outMsgs.push_back(toBack(inMsg, "ENGAGE"));
-                    _state = 2;
-                    return 1;
-                }
-                else if( startIdx == 1 ) {
-                    outMsgs.push_back(toMerge(inMsg, "STOP")) ;
-                    high_prob = false;
-                    _state = 0 ;
-                    return 3;
-                }
-                else
-                    return -1;
+            if( msg == "DISENGAGE" ) {
+                assert(src == "front") ;
+                outMsgs.push_back(toMerge(inMsg, "STOP"));
+                outMsgs.push_back(toFront(inMsg, "STOP"));
+                outMsgs.push_back(toBack(inMsg, "STOP"));
+                _state = 0 ;
+                return 3;
             }
             else if( msg == "END" ) {
                 assert(src == "merge");
                 outMsgs.push_back(toFront(inMsg, "STOP"));
                 outMsgs.push_back(toBack(inMsg, "STOP"));
-                outMsgs.push_back(Sync::revokeDeadline(inMsg, macId(), 0));
                 _state = 0;
                 return 3;
             }
             else
                 return 3;
             break;
-        case 2:
-            if( msg == "END" ) {
-                assert(src == "merge");
-                outMsgs.push_back(toFront(inMsg, "STOP"));
-                outMsgs.push_back(toBack(inMsg, "STOP"));
-                _state = 0 ;
-                return 3;
-            }
-            else if( msg == "DISENGAGE" ) {
-                assert(src == "front");
-                outMsgs.push_back(Sync::setDeadline(inMsg, macId(), 1)) ;   // Dm'
-                _state = 3;
-                return 3;
-            }
-            else
-                return 3;
-        case 3:
-            if( msg == "DEADLINE" ) {
-                int did = inMsg->getParam(1);
-                if( did == 1 ) {
-                    outMsgs.push_back(toMerge(inMsg, "STOP"));
-                    outMsgs.push_back(toFront(inMsg, "STOP"));
-                    outMsgs.push_back(toBack(inMsg, "STOP"));
-                    _state = 0;
-                    return 3;
-                }
-                else
-                    return 3;
-            }
-            else
-                return 3;
         default:
             return -1;
             break;
