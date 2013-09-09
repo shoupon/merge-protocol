@@ -31,18 +31,6 @@ int Lock::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &hi
         case 0:
             if( msg == "ATTEMPT" ) {
                 assert(src == "merge");
-                MessageTuple* msg2front = new MessageTuple(inMsg->srcID(),
-                                                           machineToInt("front"),
-                                                           inMsg->srcMsgId(),
-                                                           messageToInt("FREE"),
-                                                           macId()) ;
-                MessageTuple* msg2back = new MessageTuple(inMsg->srcID(),
-                                                          machineToInt("back"),
-                                                          inMsg->srcMsgId(),
-                                                          messageToInt("FREE"),
-                                                          macId()) ;
-                outMsgs.push_back(msg2front);
-                outMsgs.push_back(msg2back);
                 _state = 1;
                 return 3;
             }
