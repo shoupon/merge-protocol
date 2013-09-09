@@ -142,6 +142,9 @@ int main( int argc, char* argv[] )
         pvObj.addSTOP(&stop1);
         
         StoppingState stop2(startPoint);
+        stop2.addAllow(new StateSnapshot(4), 1);     // merge
+        stop2.addAllow(new StateSnapshot(3), 2);     // front
+        stop2.addAllow(new StateSnapshot(3), 3);     // back
         stop2.addAllow(new StateSnapshot(2), 4);     // lock
         stop2.addAllow(new StateSnapshot(2), 5);     // periodic
         stop2.addAllow(new StateSnapshot(1), 6) ;    // icc merge
@@ -149,6 +152,10 @@ int main( int argc, char* argv[] )
         stop2.addAllow(new StateSnapshot(1), 8) ;    // icc back
         stop2.addAllow(new StateSnapshot(2), 11);    // driver
         pvObj.addSTOP(&stop2);
+        
+        StoppingState stop3(startPoint);
+        stop3.addAllow(new StateSnapshot(1), 10);    // sensor front
+        pvObj.addSTOP(&stop3);
         
         // Driver is notified clear_to_move, but the gap is not ready yet
         StoppingState err1a(startPoint);
@@ -181,7 +188,7 @@ int main( int argc, char* argv[] )
         StoppingState err3a(startPoint);
         err3a.addAllow(new StateSnapshot(1), 10);    // sensor front
         err3a.addAllow(new StateSnapshot(1), 11);    // driver
-        pvObj.addError(&err3a);
+        //pvObj.addError(&err3a);
         
         StoppingState err3b(startPoint);
         err3b.addAllow(new StateSnapshot(1), 10);    // sensor front
@@ -195,16 +202,6 @@ int main( int argc, char* argv[] )
         err4a.addAllow(new StateSnapshot(0), 5);     // periodic
         pvObj.addError(&err4a);
         
-        StoppingState err4b(startPoint);
-        err4b.addAllow(new StateSnapshot(2), 11);    // driver
-        err4b.addAllow(new StateSnapshot(1), 5);     // periodic
-        pvObj.addError(&err4b);
-        
-        StoppingState err4c(startPoint);
-        err4c.addAllow(new StateSnapshot(2), 11);    // driver
-        err4c.addAllow(new StateSnapshot(3), 5);     // periodic
-        pvObj.addError(&err4c);
-        
         StoppingState err4d(startPoint);
         err4d.addAllow(new StateSnapshot(2), 11);    // driver
         err4d.addAllow(new StateSnapshot(0), 4);     // lock
@@ -214,21 +211,6 @@ int main( int argc, char* argv[] )
         err4e.addAllow(new StateSnapshot(2), 11);    // driver
         err4e.addAllow(new StateSnapshot(1), 4);     // lock
         pvObj.addError(&err4e);
-        
-        StoppingState err4f(startPoint);
-        err4f.addAllow(new StateSnapshot(2), 11);    // driver
-        err4f.addAllow(new StateSnapshot(3), 4);     // lock
-        pvObj.addError(&err4f);
-
-        StoppingState err4g(startPoint);
-        err4g.addAllow(new StateSnapshot(2), 11);    // driver
-        err4g.addAllow(new StateSnapshot(4), 4);     // lock
-        pvObj.addError(&err4g);
-
-        StoppingState err4h(startPoint);
-        err4h.addAllow(new StateSnapshot(2), 11);    // driver
-        err4h.addAllow(new StateSnapshot(5), 4);     // lock
-        pvObj.addError(&err4h);
         
         // Driver is cleared to move but the cruise control is reset
         StoppingState err5a(startPoint);
