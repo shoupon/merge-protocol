@@ -33,6 +33,11 @@ int Front::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &h
                 _state = 1;
                 return 3;
             }
+            else if( msg == "EMERGENCY") {
+                assert(src == "sensor(f)");
+                _state = 7;
+                return 3;
+            }
             else
                 return 3;
             break;
@@ -50,6 +55,11 @@ int Front::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &h
             else if( msg == "FREE" ) {
                 assert(src == "lock") ;
                 _state = 0 ;
+                return 3;
+            }
+            else if( msg == "EMERGENCY") {
+                assert(src == "sensor(f)");
+                _state = 8 ;
                 return 3;
             }
             else
@@ -95,14 +105,14 @@ int Front::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &h
                 return 3;
             break;
         case 3:
-            if( msg == "FREE" )  {
-                assert(src == "lock");
+            if( msg == "STOP") {
+                assert(src == "periodic");
                 outMsgs.push_back(new MessageTuple(inMsg->srcID(),
                                                    machineToInt("cruise(f)"),
                                                    inMsg->srcMsgId(),
                                                    messageToInt("RESET"),
                                                    macId()));
-                _state = 0 ;
+                _state = 6 ;
                 return 3;
             }
             else if( msg == "EMERGENCY" ) {
@@ -141,6 +151,35 @@ int Front::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &h
             else
                 return 3;
             break;
+        case 6:
+            if( msg == "FREE" ) {
+                assert(src == "LOCK") ;
+                _state = 0 ;
+                return 3;
+            }
+            else
+                return 3;
+        case 7:
+            if( msg == "COOPERATE") {
+                assert(src == "lock");
+                _state = 8 ;
+                return 3;
+            }
+            else
+                return 3;
+        case 8:
+            if( msg == "ENGAGE"){
+                assert(src == "periodic");
+                _state = 5;
+                outMsgs.push_back(new MessageTuple(inMsg->srcID(),
+                                                   machineToInt("periodic"),
+                                                   inMsg->srcMsgId(),
+                                                   messageToInt("DISENGAGE"),
+                                                   macId()));
+                return 3;
+            }
+            else
+                return 3;
         default:
             return -1;
             break;
