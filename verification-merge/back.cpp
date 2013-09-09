@@ -60,6 +60,11 @@ int Back::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &hi
             }
             else if( msg == "STOP" ) {
                 assert(src == "periodic");
+                outMsgs.push_back(new MessageTuple(inMsg->srcID(),
+                                                   machineToInt("cruise(b)"),
+                                                   inMsg->srcMsgId(),
+                                                   messageToInt("RESET"),
+                                                   macId()));
                 _state = 4;
                 return 3;
             }
@@ -87,6 +92,11 @@ int Back::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &hi
             }
             else if( msg == "STOP") {
                 assert(src == "periodic") ;
+                outMsgs.push_back(new MessageTuple(inMsg->srcID(),
+                                                   machineToInt("cruise(b)"),
+                                                   inMsg->srcMsgId(),
+                                                   messageToInt("RESET"),
+                                                   macId()));
                 _state = 4;
                 return 3;
             }

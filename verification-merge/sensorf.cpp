@@ -25,11 +25,12 @@ int SensorF::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool 
 
 int SensorF::nullInputTrans(vector<MessageTuple *> &outMsgs, bool &high_prob, int startIdx)
 {
-    if( startIdx == 0 ) {
+    if( startIdx == 0 && _state == 0 ) {
         MessageTuple* msg = new MessageTuple(0, machineToInt("front"),
                                              0, messageToInt("EMERGENCY"), macId());
         outMsgs.push_back(msg);
         high_prob = false ;
+        _state = 1;
         return 3;
     }
     else

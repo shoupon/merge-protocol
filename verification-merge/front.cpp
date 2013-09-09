@@ -81,6 +81,16 @@ int Front::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &h
                 _state = 0 ;
                 return 3;
             }
+            else if( msg == "EMERGENCY" ) {
+                assert(src == "sensor(f)") ;
+                outMsgs.push_back(new MessageTuple(inMsg->srcID(),
+                                                   machineToInt("periodic"),
+                                                   inMsg->srcMsgId(),
+                                                   messageToInt("DISENGAGE"),
+                                                   macId()));
+                _state = 5;
+                return 3;
+            }
             else
                 return 3;
             break;

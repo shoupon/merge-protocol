@@ -70,6 +70,14 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs, bool &hi
                 MessageTuple* out = createOutput(inMsg, machineToInt("lock"),
                                                  messageToInt("UNLOCK")) ;
                 outMsgs.push_back(out);
+                outMsgs.push_back(Sync::revokeDeadline(inMsg, macId(), 3));
+                _state = 0 ;
+                return 3;
+            }
+            else if( msg == "FREE") {
+                assert(src == "lock");
+                outMsgs.push_back(createOutput(inMsg, machineToInt("driver"),
+                                               messageToInt("ABORT"))) ;
                 _state = 0 ;
                 return 3;
             }
@@ -129,6 +137,17 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs, bool &hi
                 _state = 4;
                 return 3;
             }
+            else if( msg == "GAPTAKEN") {
+                assert(src == "coordsensor");
+                outMsgs.push_back(createOutput(inMsg, machineToInt("driver"),
+                                               messageToInt("ABORT")));
+                outMsgs.push_back(createOutput(inMsg, machineToInt("cruise(m)"),
+                                               messageToInt("RESET"))) ;
+                outMsgs.push_back(createOutput(inMsg, machineToInt("periodic"),
+                                               messageToInt("END")));
+                _state = 5;
+                return 3 ;
+            }
             else if( msg == "STOP" ) {
                 assert(src == "periodic");
                 outMsgs.push_back(createOutput(inMsg, machineToInt("driver"),
@@ -181,12 +200,25 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs, bool &hi
                 _state = 0 ;
                 return 3;
             }
+            else if( msg == "GAPTAKEN") {
+                assert(src == "coordsensor");
+                outMsgs.push_back(createOutput(inMsg, machineToInt("driver"),
+                                               messageToInt("ABORT")));
+                outMsgs.push_back(createOutput(inMsg, machineToInt("cruise(m)"),
+                                               messageToInt("RESET"))) ;
+                outMsgs.push_back(createOutput(inMsg, machineToInt("periodic"),
+                                               messageToInt("END")));
+                _state = 5;
+                return 3 ;
+            }
             else if( msg == "STOP") {
                 assert(src == "periodic");
                 outMsgs.push_back(createOutput(inMsg, machineToInt("driver"),
                                                messageToInt("ABORT"))) ;
                 outMsgs.push_back(createOutput(inMsg, machineToInt("coordsensor"),
                                                messageToInt("STOP")));
+                outMsgs.push_back(createOutput(inMsg, machineToInt("cruise(m)"),
+                                               messageToInt("RESET"))) ;
                 _state = 5;
                 return 3 ;
             }
@@ -196,8 +228,6 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs, bool &hi
         case 5:
             if( msg == "FREE") {
                 assert(src == "lock") ;
-                outMsgs.push_back(createOutput(inMsg, machineToInt("cruise(m)"),
-                                               messageToInt("RESET"))) ;
                 outMsgs.push_back(createOutput(inMsg, machineToInt("coordsensor"),
                                                messageToInt("STOP")));
                 _state = 0 ;
