@@ -53,12 +53,7 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs, bool &hi
         case 1:
             if( msg == "SUCCESS" ) {
                 assert(src == "lock") ;
-                SyncMessage* d2 = new SyncMessage(inMsg->srcID(),
-                                                  machineToInt("sync"),
-                                                  inMsg->srcMsgId(),
-                                                  messageToInt("SET"),
-                                                  macId(), true, 2) ;
-                outMsgs.push_back(d2) ;
+                outMsgs.push_back(Sync::setDeadline(inMsg, macId(), 2)) ;
                 MessageTuple* out = createOutput(inMsg, machineToInt("periodic"),
                                                  messageToInt("START")) ;
                 outMsgs.push_back(out) ;
@@ -172,6 +167,21 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs, bool &hi
                 _state = 0 ;
                 return 3;
             }
+            else if( msg == "DEADLINE" ) {
+                int did = inMsg->getParam(1) ;
+                if(did != 2)
+                    return 3;
+                outMsgs.push_back(createOutput(inMsg, machineToInt("periodic"),
+                                               messageToInt("END")));
+                outMsgs.push_back(createOutput(inMsg, machineToInt("driver"),
+                                               messageToInt("ABORT")));
+                outMsgs.push_back(createOutput(inMsg, machineToInt("cruise(m)"),
+                                               messageToInt("RESET")));
+                outMsgs.push_back(createOutput(inMsg, machineToInt("coordsensor"),
+                                               messageToInt("STOP")));
+                _state = 5 ;
+                return 3;
+            }
             else
                 return 3;
             break;
@@ -184,6 +194,7 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs, bool &hi
                                                messageToInt("UNLOCK"))) ;
                 outMsgs.push_back(createOutput(inMsg, machineToInt("periodic"),
                                                messageToInt("END"))) ;
+                //TODO revoke deadlines
                 _state = 0 ;
                 return 3;
             }

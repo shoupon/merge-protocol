@@ -82,7 +82,7 @@ int Driver::nullInputTrans(vector<MessageTuple *> &outMsgs, bool &high_prob, int
             return 3;
             break;
         case 2:
-            outMsgs.push_back(new MessageTuple(0, machineToInt("driver"),
+            outMsgs.push_back(new MessageTuple(0, machineToInt("merge"),
                                                0, messageToInt("COMPLETE"), macId()));
             _state = 0 ;
             return 3;

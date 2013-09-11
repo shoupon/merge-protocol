@@ -146,16 +146,26 @@ int main( int argc, char* argv[] )
         stop2.addAllow(new StateSnapshot(3), 2);     // front
         stop2.addAllow(new StateSnapshot(3), 3);     // back
         stop2.addAllow(new StateSnapshot(2), 4);     // lock
-        stop2.addAllow(new StateSnapshot(2), 5);     // periodic
+        stop2.addAllow(new StateSnapshot(1), 5);     // periodic
         stop2.addAllow(new StateSnapshot(1), 6) ;    // icc merge
         stop2.addAllow(new StateSnapshot(1), 7) ;    // icc front
         stop2.addAllow(new StateSnapshot(1), 8) ;    // icc back
         stop2.addAllow(new StateSnapshot(2), 11);    // driver
         pvObj.addSTOP(&stop2);
         
-        StoppingState stop3(startPoint);
-        stop3.addAllow(new StateSnapshot(1), 10);    // sensor front
-        pvObj.addSTOP(&stop3);
+        StoppingState end1(startPoint);
+        end1.addAllow(new StateSnapshot(0), 1) ;    // merge
+        end1.addAllow(new StateSnapshot(0), 2) ;    // front
+        end1.addAllow(new StateSnapshot(0), 3) ;    // back
+        end1.addAllow(new StateSnapshot(0), 4) ;    // lock
+        end1.addAllow(new StateSnapshot(0), 5) ;    // periodic
+        end1.addAllow(new StateSnapshot(0), 6) ;    // icc merge
+        end1.addAllow(new StateSnapshot(0), 7) ;    // icc front
+        end1.addAllow(new StateSnapshot(0), 8) ;    // icc back
+        end1.addAllow(new StateSnapshot(0), 9) ;    // coord sensor
+        end1.addAllow(new StateSnapshot(1), 10);    // sensor front
+        end1.addAllow(new StateSnapshot(0), 11) ;   // driver
+        pvObj.addEND(&end1);
         
         // Driver is notified clear_to_move, but the gap is not ready yet
         StoppingState err1a(startPoint);

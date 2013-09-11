@@ -115,6 +115,16 @@ int Front::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &h
                 _state = 6 ;
                 return 3;
             }
+            else if( msg == "FREE" ) {
+                assert(src == "lock");
+                outMsgs.push_back(new MessageTuple(inMsg->srcID(),
+                                                   machineToInt("cruise(f)"),
+                                                   inMsg->srcMsgId(),
+                                                   messageToInt("RESET"),
+                                                   macId()));
+                _state = 0 ;
+                return 3;
+            }
             else if( msg == "EMERGENCY" ) {
                 assert(src == "sensor(f)") ;
                 outMsgs.push_back(new MessageTuple(inMsg->srcID(),
@@ -153,7 +163,7 @@ int Front::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &h
             break;
         case 6:
             if( msg == "FREE" ) {
-                assert(src == "LOCK") ;
+                assert(src == "lock") ;
                 _state = 0 ;
                 return 3;
             }
