@@ -63,6 +63,23 @@ int Periodic::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool
     }
 }
 
+int Periodic::nullInputTrans(vector<MessageTuple *> &outMsgs, bool &high_prob, int startIdx)
+{
+    outMsgs.clear() ;
+    if( _state != 1 )
+        return -1;
+    high_prob = false;
+    if( startIdx == 0 ) {
+        outMsgs.push_back(toMerge(0, "STOP"));
+        outMsgs.push_back(toFront(0, "STOP"));
+        outMsgs.push_back(toBack(0, "STOP"));
+        _state = 0 ;
+        return 3;
+    }
+    else
+        return -1;
+}
+
 MessageTuple* Periodic::toMerge(MessageTuple *inMsg, string msg)
 {
     return createMsg(inMsg, "merge", msg);
@@ -80,6 +97,10 @@ MessageTuple* Periodic::toBack(MessageTuple *inMsg, string msg)
 
 MessageTuple* Periodic::createMsg(MessageTuple *inMsg, string dest, string msg)
 {
-    return new MessageTuple(inMsg->srcID(), machineToInt(dest),
-                            inMsg->destId(), messageToInt(msg), macId()) ;
+    if( inMsg == 0 )
+        return new MessageTuple(0, machineToInt(dest),
+                                0, messageToInt(msg), macId()) ;
+    else
+        return new MessageTuple(inMsg->srcID(), machineToInt(dest),
+                                inMsg->srcMsgId(), messageToInt(msg), macId()) ;
 }

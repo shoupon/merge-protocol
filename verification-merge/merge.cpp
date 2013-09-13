@@ -97,7 +97,7 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs, bool &hi
                                                messageToInt("UNLOCK")));
                 outMsgs.push_back(createOutput(inMsg, machineToInt("driver"),
                                                messageToInt("ABORT"))) ;
-                _state = 0 ;
+                _state = 6 ;
                 return 3;
             }
             else if( msg == "CANCEL") {
@@ -106,7 +106,7 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs, bool &hi
                                                messageToInt("UNLOCK"))) ;
                 outMsgs.push_back(createOutput(inMsg, machineToInt("periodic"),
                                                messageToInt("END")));
-                _state = 0 ;
+                _state = 6 ;
                 return 3;
             }
             else if( msg == "DEADLINE" ) {
@@ -118,7 +118,7 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs, bool &hi
                                                messageToInt("UNLOCK")));
                 outMsgs.push_back(createOutput(inMsg, machineToInt("driver"),
                                                messageToInt("ABORT"))) ;
-                _state = 0 ;
+                _state = 6 ;
                 return 3;
             }
             else
@@ -194,8 +194,7 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs, bool &hi
                                                messageToInt("UNLOCK"))) ;
                 outMsgs.push_back(createOutput(inMsg, machineToInt("periodic"),
                                                messageToInt("END"))) ;
-                //TODO revoke deadlines
-                _state = 0 ;
+                _state = 6 ;
                 return 3;
             }
             else if( msg == "FREE") {
@@ -247,6 +246,15 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs, bool &hi
             else
                 return 3;
             break ;
+        case 6:
+            if( msg == "DEADLINE") {
+                int did = inMsg->getParam(1);
+                if( did == 3 )
+                    _state = 0 ;
+                return 3;
+            }
+            else
+                return 3;
         default:
             return -1;
             break;
