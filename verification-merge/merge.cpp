@@ -65,7 +65,7 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs, bool &hi
                 MessageTuple* out = createOutput(inMsg, machineToInt("lock"),
                                                  messageToInt("UNLOCK")) ;
                 outMsgs.push_back(out);
-                outMsgs.push_back(Sync::revokeDeadline(inMsg, macId(), 3));
+                //outMsgs.push_back(Sync::revokeDeadline(inMsg, macId(), 3));
                 _state = 0 ;
                 return 3;
             }
