@@ -20,6 +20,7 @@ class LockSnapshot;
 
 class Lock: public StateMachine
 {
+    enum Role {Merge, Front, Back};
 public:
     Lock( Lookup* msg, Lookup* mac );
     ~Lock() {}
@@ -27,6 +28,8 @@ public:
                 bool& high_prob, int startIdx = 0);
     int nullInputTrans(vector<MessageTuple*>& outMsgs,
                        bool& high_prob, int startIdx = 0);
+private:
+    MessageTuple* createFreeMsg(MessageTuple* inMsg, Role r);
 };
 
 #endif /* defined(LOCK_H) */
