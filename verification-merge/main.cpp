@@ -121,6 +121,11 @@ int main( int argc, char* argv[] )
         // Add checker into ProbVerifier
         pvObj.addChecker(&mergeChk);
         
+        // Add a default service (stub)
+        Service *srvc = new Service();
+        srvc->reset();
+        GlobalState::setService(srvc);
+        
         // Specify the starting state
         GlobalState* startPoint = new GlobalState(pvObj.getMachinePtrs(), &mergeChkState);
         startPoint->setParser(psrPtr);
