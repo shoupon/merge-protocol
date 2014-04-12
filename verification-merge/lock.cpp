@@ -121,6 +121,20 @@ int Lock::nullInputTrans(vector<MessageTuple *> &outMsgs, bool &high_prob, int s
     }
 }
 
+void Lock::restore(const StateSnapshot *snapshot)
+{
+    assert(typeid(*snapshot) == typeid(LockSnapshot)) ;
+    const LockSnapshot *ls = dynamic_cast<const LockSnapshot*>(snapshot) ;
+    _did = ls->_ss_did;
+    _purpose = ls->_ss_purpose ;
+    _state = ls->_ss_state ;
+}
+
+StateSnapshot* Lock::curState()
+{
+    return new LockSnapshot(_state, _did, _purpose);
+}
+
 
 MessageTuple* Lock::createCoopMsg(Role r)
 {
@@ -152,4 +166,11 @@ MessageTuple* Lock::createSuccMsg()
                                        0, messageToInt("SUCCESS"),
                                        macId(), _purpose);
     return msg;
+}
+
+string LockSnapshot::toString()
+{
+    stringstream ss;
+    ss << _ss_state << "," << _ss_did << "(" << _ss_purpose << ")" ;
+    return ss.str();
 }
