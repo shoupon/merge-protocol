@@ -10,8 +10,12 @@
 #define MERGE_H
 
 #include <iostream>
+#include <string>
+using namespace std;
 
 #include "../prob_verify/statemachine.h"
+#include "../prob_verify/sync.h"
+#include "lock.h"
 
 class MergeSnapshot;
 
@@ -26,6 +30,8 @@ public:
                        bool& high_prob, int startIdx = 0);        
 private:
     MessageTuple* createOutput(MessageTuple* inMsg, int dest, int destMsg);
+    SyncMessage* createSetMsg(MessageTuple* inMsg, int did);
+    LockMessage* createLockMsg(MessageTuple* inMsg, string purpose) ;
 };
 
 #endif 
