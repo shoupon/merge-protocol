@@ -31,6 +31,7 @@ private:
     MessageTuple* createMsg(MessageTuple* inMsg, const string& dest, string msg);
     MessageTuple* emergency(const string& dest);
     MessageTuple* gapTaken(const string& dest);
+    MessageTuple* loss(const string& dest);
 };
 
 #endif /* defined(TRBP_H) */

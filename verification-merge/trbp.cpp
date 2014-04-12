@@ -82,7 +82,7 @@ int TRBP::nullInputTrans(vector<MessageTuple *> &outMsgs, bool &high_prob, int s
         case 0:
             return -1;
         case 1:
-            if( startIdx == 2 ) {
+            if( startIdx == 3 ) {
                 outMsgs.push_back(createMsg(0, "merge", "READY"));
                 return 3;
             }
@@ -100,6 +100,11 @@ int TRBP::nullInputTrans(vector<MessageTuple *> &outMsgs, bool &high_prob, int s
                 outMsgs.push_back(gapTaken("back"));
                 high_prob = false;
                 return 2;
+            }
+            else if( startIdx == 2) {
+                outMsgs.push_back(loss("merge"));
+                outMsgs.push_back(loss("back"));
+                outMsgs.push_back(loss("front"));
             }
             else {
                 return -1;
@@ -122,10 +127,17 @@ MessageTuple* TRBP::createMsg(MessageTuple *inMsg, const string& dest, string ms
                                 inMsg->srcMsgId(), messageToInt(msg), macId()) ;
 }
 
-MessageTuple* TRBP::emergency(const string& dest) {
+MessageTuple* TRBP::emergency(const string& dest)
+{
     return createMsg(0, dest, "EMERGENCY");
 }
 
-MessageTuple* TRBP::gapTaken(const string& dest) {
+MessageTuple* TRBP::gapTaken(const string& dest)
+{
     return createMsg(0, dest, "GAPTAKEN");
+}
+
+MessageTuple* TRBP::loss(const string &dest)
+{
+    return createMsg(0, dest, "COMMLOSS");
 }
