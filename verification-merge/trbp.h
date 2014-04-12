@@ -20,8 +20,8 @@
 class TRBP: public StateMachine
 {
 public:
-    Periodic( Lookup* msg, Lookup* mac );
-    ~Periodic() {}
+    TRBP( Lookup* msg, Lookup* mac );
+    ~TRBP() {}
     int transit(MessageTuple* inMsg, vector<MessageTuple*>& outMsgs,
                 bool& high_prob, int startIdx = 0) ;
     int nullInputTrans(vector<MessageTuple*>& outMsgs,

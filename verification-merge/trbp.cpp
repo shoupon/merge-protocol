@@ -17,18 +17,18 @@
 //  Copyright (c) 2013 Shou-pon Lin. All rights reserved.
 //
 
-#include "periodic.h"
+#include "trbp.h"
 #include "../prob_verify/sync.h"
 
 
 
-Periodic::Periodic( Lookup* msg, Lookup* mac ):StateMachine(msg, mac)
+TRBP::TRBP( Lookup* msg, Lookup* mac ):StateMachine(msg, mac)
 {
     setId(machineToInt("periodic")) ;
     reset();
 }
 
-int Periodic::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &high_prob,
+int TRBP::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &high_prob,
                       int startIdx)
 {
     outMsgs.clear();
@@ -72,7 +72,7 @@ int Periodic::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool
     }
 }
 
-int Periodic::nullInputTrans(vector<MessageTuple *> &outMsgs, bool &high_prob, int startIdx)
+int TRBP::nullInputTrans(vector<MessageTuple *> &outMsgs, bool &high_prob, int startIdx)
 {
     outMsgs.clear() ;
     if( _state != 1 )
@@ -107,11 +107,12 @@ int Periodic::nullInputTrans(vector<MessageTuple *> &outMsgs, bool &high_prob, i
             break;
             
         default:
+            return -1;
             break;
     }
 }
 
-MessageTuple* Periodic::createMsg(MessageTuple *inMsg, string dest, string msg)
+MessageTuple* TRBP::createMsg(MessageTuple *inMsg, const string& dest, string msg)
 {
     if( inMsg == 0 )
         return new MessageTuple(0, machineToInt(dest),
@@ -121,10 +122,10 @@ MessageTuple* Periodic::createMsg(MessageTuple *inMsg, string dest, string msg)
                                 inMsg->srcMsgId(), messageToInt(msg), macId()) ;
 }
 
-MessageTuple* Periodic::emergency(const string& dest) {
+MessageTuple* TRBP::emergency(const string& dest) {
     return createMsg(0, dest, "EMERGENCY");
 }
 
-MessageTuple* Periodic::gapTaken(const string& dest) {
+MessageTuple* TRBP::gapTaken(const string& dest) {
     return createMsg(0, dest, "GAPTAKEN");
 }
