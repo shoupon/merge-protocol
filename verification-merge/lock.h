@@ -18,9 +18,10 @@
 
 class LockSnapshot;
 
+enum Role {Merge, Front, Back};
+
 class Lock: public StateMachine
 {
-    enum Role {Merge, Front, Back};
 public:
     Lock( Lookup* msg, Lookup* mac, int did );
     ~Lock() {}

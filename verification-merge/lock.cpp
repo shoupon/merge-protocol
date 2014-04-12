@@ -122,7 +122,7 @@ int Lock::nullInputTrans(vector<MessageTuple *> &outMsgs, bool &high_prob, int s
 }
 
 
-MessageTuple* Lock::createCoopMsg(Lock::Role r)
+MessageTuple* Lock::createCoopMsg(Role r)
 {
     int destId ;
     switch (r) {

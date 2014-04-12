@@ -1,4 +1,15 @@
 //
+//  trbp.cpp
+//  verification-merge
+//
+//  Created by Shou-pon Lin on 4/11/14.
+//  Copyright (c) 2014 Shou-pon Lin. All rights reserved.
+//
+
+#include "trbp.h"
+
+
+//
 //  periodic.cpp
 //  verification-merge
 //
@@ -8,6 +19,8 @@
 
 #include "periodic.h"
 #include "../prob_verify/sync.h"
+
+
 
 Periodic::Periodic( Lookup* msg, Lookup* mac ):StateMachine(msg, mac)
 {
@@ -29,33 +42,29 @@ int Periodic::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool
         case 0:
             if( msg == "START" ) {
                 assert(src == "merge");
-                outMsgs.push_back(toMerge(inMsg, "ENGAGE"));
-                outMsgs.push_back(toFront(inMsg, "ENGAGE"));
-                outMsgs.push_back(toBack(inMsg, "ENGAGE"));
                 _state = 1;
                 return 3;
             }
             else
-                return 3;
+                return -1;
             break;
         case 1:
-            if( msg == "DISENGAGE" ) {
-                assert(src == "front") ;
-                outMsgs.push_back(toMerge(inMsg, "STOP"));
-                outMsgs.push_back(toFront(inMsg, "STOP"));
-                outMsgs.push_back(toBack(inMsg, "STOP"));
+            if( msg == "STOP" ) {
+                assert(src == "merge") ;
                 _state = 0 ;
                 return 3;
             }
-            else if( msg == "END" ) {
+            else
+                return -1;
+            break;
+        case 2:
+            if( msg == "STOP" ) {
                 assert(src == "merge");
-                outMsgs.push_back(toFront(inMsg, "STOP"));
-                outMsgs.push_back(toBack(inMsg, "STOP"));
                 _state = 0;
                 return 3;
             }
             else
-                return 3;
+                return -1;
             break;
         default:
             return -1;
@@ -69,30 +78,37 @@ int Periodic::nullInputTrans(vector<MessageTuple *> &outMsgs, bool &high_prob, i
     if( _state != 1 )
         return -1;
     high_prob = false;
-    if( startIdx == 0 ) {
-        outMsgs.push_back(toMerge(0, "STOP"));
-        outMsgs.push_back(toFront(0, "STOP"));
-        outMsgs.push_back(toBack(0, "STOP"));
-        _state = 0 ;
-        return 3;
+    switch (_state) {
+        case 0:
+            return -1;
+        case 1:
+            if( startIdx == 2 ) {
+                outMsgs.push_back(createMsg(0, "merge", "READY"));
+                return 3;
+            }
+        case 2:
+            if( startIdx == 0 ) {
+                outMsgs.push_back(emergency("merge"));
+                outMsgs.push_back(emergency("front"));
+                outMsgs.push_back(emergency("back"));
+                high_prob = false;
+                return 1;
+            }
+            else if( startIdx == 1) {
+                outMsgs.push_back(gapTaken("merge"));
+                outMsgs.push_back(gapTaken("front"));
+                outMsgs.push_back(gapTaken("back"));
+                high_prob = false;
+                return 2;
+            }
+            else {
+                return -1;
+            }
+            break;
+            
+        default:
+            break;
     }
-    else
-        return -1;
-}
-
-MessageTuple* Periodic::toMerge(MessageTuple *inMsg, string msg)
-{
-    return createMsg(inMsg, "merge", msg);
-}
-
-MessageTuple* Periodic::toFront(MessageTuple* inMsg, string msg)
-{
-    return createMsg(inMsg, "front", msg);
-}
-
-MessageTuple* Periodic::toBack(MessageTuple *inMsg, string msg)
-{
-    return createMsg(inMsg, "back", msg);
 }
 
 MessageTuple* Periodic::createMsg(MessageTuple *inMsg, string dest, string msg)
@@ -103,4 +119,12 @@ MessageTuple* Periodic::createMsg(MessageTuple *inMsg, string dest, string msg)
     else
         return new MessageTuple(inMsg->srcID(), machineToInt(dest),
                                 inMsg->srcMsgId(), messageToInt(msg), macId()) ;
+}
+
+MessageTuple* Periodic::emergency(const string& dest) {
+    return createMsg(0, dest, "EMERGENCY");
+}
+
+MessageTuple* Periodic::gapTaken(const string& dest) {
+    return createMsg(0, dest, "GAPTAKEN");
 }
