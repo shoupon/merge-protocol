@@ -9,14 +9,14 @@
 #include "lock.h"
 #include "../prob_verify/statemachine.h"
 
-#include <cstdlib>
-
 
 Lock::Lock( Lookup* msg, Lookup* mac, int did ): StateMachine(msg, mac)
 {
-    string name = "lock";
-    name += itoa(did);
-    setId(machineToInt(name));
+    stringstream ss;
+    ss << "lock(" ;
+    ss << did ;
+    ss << ")" ;
+    setId(machineToInt(ss.str()));
     reset();
 }
 

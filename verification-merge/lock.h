@@ -11,6 +11,7 @@
 
 #include <iostream>
 #include <sstream>
+using namespace std;
 
 #include "merge.h"
 #include "../prob_verify/statemachine.h"
