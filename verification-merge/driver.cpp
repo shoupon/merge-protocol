@@ -11,12 +11,12 @@
 Driver::Driver( Lookup* msg, Lookup* mac)
 :StateMachine(msg, mac)
 {
-    setId(machineToInt("driver"));
+    setId(machineToInt(DRIVER_NAME));
     reset();
 }
 
-int Driver::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &high_prob,
-                    int startIdx)
+int Driver::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs,
+                    bool &high_prob, int startIdx)
 {
     outMsgs.clear();
     high_prob = true ;
@@ -30,13 +30,13 @@ int Driver::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &
         case 0:
             return 3;
         case 1:
-            if( msg == "ABORT" ) {
-                assert(src == "merge");
+            if( msg == ABORT ) {
+                assert(src == MERGE_NAME);
                 _state = 0 ;
                 return 3;
             }
-            else if( msg == "CLEARTOMOVE" ) {
-                assert(src == "merge");
+            else if( msg == GREENLIGHT ) {
+                assert(src == MERGE_NAME);
                 _state = 2;
                 return 3;
             }
@@ -44,8 +44,8 @@ int Driver::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &
                 return 3;
             break;
         case 2:
-            if( msg == "ABORT" ) {
-                assert(src == "merge");
+            if( msg == ABORT ) {
+                assert(src == MERGE_NAME);
                 _state = 0 ;
                 return 3;
             }
@@ -69,21 +69,21 @@ int Driver::nullInputTrans(vector<MessageTuple *> &outMsgs, bool &high_prob, int
     
     switch (_state) {
         case 0:
-            outMsgs.push_back(new MessageTuple(0, machineToInt("merge"),
-                                               0, messageToInt("SIGNAL"), macId()));
+            outMsgs.push_back(new MessageTuple(0, machineToInt(MERGE_NAME),
+                                               0, messageToInt(SIGNAL), macId()));
             _state = 1;
             return 3;
             break;
         case 1:
             high_prob = false ;
-            outMsgs.push_back(new MessageTuple(0, machineToInt("merge"),
-                                               0, messageToInt("CANCEL"), macId()));
+            outMsgs.push_back(new MessageTuple(0, machineToInt(MERGE_NAME),
+                                               0, messageToInt(CANCEL), macId()));
             _state = 0 ;
             return 3;
             break;
         case 2:
-            outMsgs.push_back(new MessageTuple(0, machineToInt("merge"),
-                                               0, messageToInt("COMPLETE"), macId()));
+            outMsgs.push_back(new MessageTuple(0, machineToInt(MERGE_NAME),
+                                               0, messageToInt(FINISH), macId()));
             _state = 0 ;
             return 3;
             break;
