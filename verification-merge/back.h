@@ -12,6 +12,7 @@
 #include <iostream>
 
 #include "../prob_verify/statemachine.h"
+#include "identifiers.h"
 
 class Back: public StateMachine
 {

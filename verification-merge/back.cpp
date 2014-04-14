@@ -28,93 +28,105 @@ int Back::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &hi
     string src = IntToMachine(inMsg->subjectId()) ;
     switch (_state) {
         case 0:
-            if( msg == "COOPERATE" ) {
-                assert(src == "lock") ;
+            if( msg == COOPERATE ) {
+                assert(src == LOCK_NAME) ;
                 _state = 1;
                 return 3;
             }
             else
-                return 3;
+                return -1;
             break;
         case 1:
-            if( msg == "FREE" ) {
-                assert(src == "lock") ;
-                _state = 0 ;
-                return 3;
+            if( msg == DEADLINE ) {
+                int did = inMsg->getParam(1);
+                if( did == 0 ) {
+                    _state = 0;
+                    return 3;
+                }
+                else
+                    return -1;
             }
-            else if( msg == "ENGAGE" ) {
-                assert(src == "periodic") ;
+            else if( msg == COOPERATE ) {
+                assert(src == LOCK_NAME) ;
                 _state = 2;
                 outMsgs.push_back(new MessageTuple(inMsg->srcID(),
-                                                   machineToInt("cruise(b)"),
+                                                   machineToInt(CRUISE_BACK_NAME),
                                                    inMsg->srcMsgId(),
-                                                   messageToInt("CREATE"),
+                                                   messageToInt(MAKEGAP),
                                                    macId()));
                 return 3;
             }
+            else
+                return -1;
         case 2:
-            if( msg == "READY" ) {
-                assert(src == "coordsensor") ;
-                _state = 3;
+            if( msg == DEADLINE ) {
+                int did = inMsg->getParam(1);
+                if( did == 0 )
+                    return 3;
+                else if( did != 1 )
+                    return -1;
+                // did == 1
+                outMsgs.push_back(new MessageTuple(inMsg->srcID(),
+                                                   machineToInt(CRUISE_BACK_NAME),
+                                                   inMsg->srcMsgId(),
+                                                   messageToInt(RESET),
+                                                   macId()));
+                _state = 0;
+                return 3;
+            }
+            else if( msg == EMERGENCY ) {
+                assert(src == TRBP_NAME) ;
+                outMsgs.push_back(new MessageTuple(inMsg->srcID(),
+                                                   machineToInt(CRUISE_BACK_NAME),
+                                                   inMsg->srcMsgId(),
+                                                   messageToInt(PILOT),
+                                                   macId()));
+                _state = 4;
                 return 3 ;
             }
-            else if( msg == "STOP" ) {
-                assert(src == "periodic");
-                outMsgs.push_back(new MessageTuple(inMsg->srcID(),
-                                                   machineToInt("cruise(b)"),
-                                                   inMsg->srcMsgId(),
-                                                   messageToInt("RESET"),
-                                                   macId()));
-                _state = 4;
+            else if( msg == COOPERATE ) {
+                assert(src == LOCK_NAME);
+                _state = 3;
                 return 3;
             }
-            else if( msg == "FREE" ) {
-                assert(src == "lock");
-                outMsgs.push_back(new MessageTuple(inMsg->srcID(),
-                                                   machineToInt("cruise(b)"),
-                                                   inMsg->srcMsgId(),
-                                                   messageToInt("RESET"),
-                                                   macId()));
-                _state = 0 ;
-                return 3;
-            }
-            return 3;
+            else
+                return -1;
+            break ;
+            
         case 3:
-            if( msg == "FREE" ) {
-                assert(src == "lock") ;
+            if( msg == DEADLINE ) {
+                int did = inMsg->getParam(1);
+                if( did == 0 || did == 1)
+                    return 3;
+                assert(did == 2);
                 outMsgs.push_back(new MessageTuple(inMsg->srcID(),
-                                                   machineToInt("cruise(b)"),
+                                                   machineToInt(CRUISE_BACK_NAME),
                                                    inMsg->srcMsgId(),
-                                                   messageToInt("RESET"),
+                                                   messageToInt(RESET),
                                                    macId()));
                 _state = 0 ;
                 return 3;
             }
-            else if( msg == "STOP") {
-                assert(src == "periodic") ;
+            else if( msg == EMERGENCY ) {
+                assert(src == TRBP_NAME) ;
                 outMsgs.push_back(new MessageTuple(inMsg->srcID(),
-                                                   machineToInt("cruise(b)"),
+                                                   machineToInt(CRUISE_BACK_NAME),
                                                    inMsg->srcMsgId(),
-                                                   messageToInt("RESET"),
+                                                   messageToInt(PILOT),
                                                    macId()));
                 _state = 4;
-                return 3;
+                return 3 ;
             }
             else
-                return 3;
+                return -1;
         case 4:
-            if( msg == "FREE" ) {
-                assert(src == "lock") ;
-                outMsgs.push_back(new MessageTuple(inMsg->srcID(),
-                                                   machineToInt("cruise(b)"),
-                                                   inMsg->srcMsgId(),
-                                                   messageToInt("RESET"),
-                                                   macId()));
+            if( msg == DISENGAGE ) {
+                assert(src == CRUISE_BACK_NAME) ;
                 _state = 0 ;
                 return 3;
             }
             else
-                return 3;
+                return -1;
         default:
             return -1;
             break;
