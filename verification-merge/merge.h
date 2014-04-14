@@ -16,6 +16,7 @@ using namespace std;
 #include "../prob_verify/statemachine.h"
 #include "../prob_verify/sync.h"
 #include "lock.h"
+#include "identifiers.h"
 
 class MergeSnapshot;
 
@@ -29,6 +30,9 @@ public:
     int nullInputTrans(vector<MessageTuple*>& outMsgs,
                        bool& high_prob, int startIdx = 0);        
 private:
+    bool isEmergency(MessageTuple* inMsg, vector<MessageTuple*>& outMsgs);
+    void abortSeq(MessageTuple* inMsg, vector<MessageTuple*>& outMsgs);
+    void cancelSeq(MessageTuple* inMsg, vector<MessageTuple*>& outMsgs);
     MessageTuple* createOutput(MessageTuple* inMsg, int dest, int destMsg);
     SyncMessage* createSetMsg(MessageTuple* inMsg, int did);
     LockMessage* createLockMsg(MessageTuple* inMsg, string purpose) ;

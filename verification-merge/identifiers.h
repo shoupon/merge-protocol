@@ -19,6 +19,7 @@
 #define BACK_NAME "back"
 #define MERGE_NAME "merge"
 #define DRIVER_NAME "driver"
+#define SYNC_NAME "sync"
 
 // List of message names
 // Lock
@@ -42,5 +43,16 @@
 // Timing
 #define DEADLINE "DEADLINE"
 #define SET "SET"
+// Driver
+#define SIGNAL "SIGNAL"
+#define CANCEL "CANCEL"
+#define ABORT "ABORT"
+#define FINISH "FINISH"
+#define GREENLIGHT "GREENLIGHT"
+// Merge
+#define REQUEST "REQUEST"
+#define CREATE "CREATE"
+#define MOVE "MOVE"
+
 
 #endif // endif(IDENTIFIERS_H)
