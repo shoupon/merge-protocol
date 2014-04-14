@@ -10,8 +10,10 @@
 #define FRONT_H
 
 #include <iostream>
+#include <string>
 
 #include "../prob_verify/statemachine.h"
+#include "identifiers.h"
 
 class Front: public StateMachine
 {
