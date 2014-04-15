@@ -17,13 +17,13 @@ using namespace std;
 #include "../prob_verify/define.h"
 #include "../prob_verify/sync.h"
 
+#include "identifiers.h"
+
 #include "merge.h"
 #include "front.h"
 #include "back.h"
 #include "lock.h"
-#include "periodic.h"
-#include "coordinatedsensor.h"
-#include "sensorf.h"
+#include "trbp.h"
 #include "cruise.h"
 #include "driver.h"
 
@@ -80,20 +80,26 @@ int main( int argc, char* argv[] )
         sync->addMachine(front);
         sync->addMachine(back);
         
-        Lock* lock = new Lock(psrPtr->getMsgTable(), psrPtr->getMacTable()) ;
-        pvObj.addMachine(lock);
-        sync->addMachine(lock);
-        
-        Periodic* period = new Periodic(psrPtr->getMsgTable(), psrPtr->getMacTable());
-        pvObj.addMachine(period);
-        sync->addMachine(period);
+        Lock* lock0 = new Lock(psrPtr->getMsgTable(), psrPtr->getMacTable(), 0) ;
+        Lock* lock1 = new Lock(psrPtr->getMsgTable(), psrPtr->getMacTable(), 1) ;
+        Lock* lock2 = new Lock(psrPtr->getMsgTable(), psrPtr->getMacTable(), 2) ;
+        pvObj.addMachine(lock0);
+        sync->addMachine(lock0);
+        pvObj.addMachine(lock1);
+        sync->addMachine(lock1);
+        pvObj.addMachine(lock2);
+        sync->addMachine(lock2);
+
+        TRBP* trbp = new TRBP(psrPtr->getMsgTable(), psrPtr->getMacTable());
+        pvObj.addMachine(trbp);
+        sync->addMachine(trbp);
         
         Cruise* iccm = new Cruise(psrPtr->getMsgTable(), psrPtr->getMacTable(),
-                                  "merge", "m", "ALIGN");
+                                  MERGE_NAME, "m", ALIGN);
         Cruise* iccf = new Cruise(psrPtr->getMsgTable(), psrPtr->getMacTable(),
-                                  "front", "f", "MAINTAIN");
+                                  FRONT_NAME, "f", MAINTAIN);
         Cruise* iccb = new Cruise(psrPtr->getMsgTable(), psrPtr->getMacTable(),
-                                  "back", "b", "CREATE");
+                                  BACK_NAME, "b", MAKEGAP);
         pvObj.addMachine(iccm);
         pvObj.addMachine(iccf);
         pvObj.addMachine(iccb);
@@ -101,14 +107,6 @@ int main( int argc, char* argv[] )
         sync->addMachine(iccf);
         sync->addMachine(iccb);
         
-        CoordinatedSensor* coord = new CoordinatedSensor(psrPtr->getMsgTable(),
-                                                         psrPtr->getMacTable() );
-        pvObj.addMachine(coord);
-        sync->addMachine(coord);
-        
-        SensorF* sensf = new SensorF(psrPtr->getMsgTable(), psrPtr->getMacTable() );
-        pvObj.addMachine(sensf);
-        sync->addMachine(sensf);
         
         Driver* driver = new Driver(psrPtr->getMsgTable(), psrPtr->getMacTable());
         pvObj.addMachine(driver);
@@ -136,28 +134,29 @@ int main( int argc, char* argv[] )
         stop1.addAllow(new StateSnapshot(0), 1) ;    // merge
         stop1.addAllow(new StateSnapshot(0), 2) ;    // front
         stop1.addAllow(new StateSnapshot(0), 3) ;    // back
-        stop1.addAllow(new StateSnapshot(0), 4) ;    // lock
-        stop1.addAllow(new StateSnapshot(0), 5) ;    // periodic
-        stop1.addAllow(new StateSnapshot(0), 6) ;    // icc merge
-        stop1.addAllow(new StateSnapshot(0), 7) ;    // icc front
-        stop1.addAllow(new StateSnapshot(0), 8) ;    // icc back
-        stop1.addAllow(new StateSnapshot(0), 9) ;    // coord sensor
-        stop1.addAllow(new StateSnapshot(0), 10) ;   // sensor front
+        stop1.addAllow(new StateSnapshot(0), 4) ;    // lock 0
+        stop1.addAllow(new StateSnapshot(0), 5) ;    // lock 1
+        stop1.addAllow(new StateSnapshot(0), 6) ;    // lock 2
+        stop1.addAllow(new StateSnapshot(0), 7) ;    // trbp
+        stop1.addAllow(new StateSnapshot(0), 8) ;    // icc merge
+        stop1.addAllow(new StateSnapshot(0), 9) ;    // icc front
+        stop1.addAllow(new StateSnapshot(0), 10) ;   // icc back
         stop1.addAllow(new StateSnapshot(0), 11) ;   // driver
         pvObj.addSTOP(&stop1);
         
         StoppingState stop2(startPoint);
-        stop2.addAllow(new StateSnapshot(4), 1);     // merge
-        stop2.addAllow(new StateSnapshot(3), 2);     // front
-        stop2.addAllow(new StateSnapshot(3), 3);     // back
-        stop2.addAllow(new StateSnapshot(2), 4);     // lock
-        stop2.addAllow(new StateSnapshot(1), 5);     // periodic
-        stop2.addAllow(new StateSnapshot(1), 6) ;    // icc merge
-        stop2.addAllow(new StateSnapshot(1), 7) ;    // icc front
-        stop2.addAllow(new StateSnapshot(1), 8) ;    // icc back
-        stop2.addAllow(new StateSnapshot(2), 11);    // driver
+        stop1.addAllow(new StateSnapshot(5), 1) ;    // merge
+        stop1.addAllow(new StateSnapshot(3), 2) ;    // front
+        stop1.addAllow(new StateSnapshot(3), 3) ;    // back
+        stop1.addAllow(new StateSnapshot(5), 6) ;    // lock 2
+        stop1.addAllow(new StateSnapshot(2), 7) ;    // trbp
+        stop1.addAllow(new StateSnapshot(1), 8) ;    // icc merge
+        stop1.addAllow(new StateSnapshot(1), 9) ;    // icc front
+        stop1.addAllow(new StateSnapshot(1), 10) ;   // icc back
+        stop1.addAllow(new StateSnapshot(2), 11) ;   // driver
         pvObj.addSTOP(&stop2);
         
+        /*
         StoppingState end1(startPoint);
         end1.addAllow(new StateSnapshot(0), 1) ;    // merge
         end1.addAllow(new StateSnapshot(0), 2) ;    // front
@@ -170,87 +169,107 @@ int main( int argc, char* argv[] )
         end1.addAllow(new StateSnapshot(0), 9) ;    // coord sensor
         end1.addAllow(new StateSnapshot(1), 10);    // sensor front
         end1.addAllow(new StateSnapshot(0), 11) ;   // driver
-        pvObj.addEND(&end1);
+        pvObj.addEND(&end1);*/
         
-        // Driver is notified clear_to_move, but the gap is not ready yet
+        // Driver is notified GREENLIGHT, but the gap is not ready yet
         StoppingState err1a(startPoint);
         err1a.addAllow(new StateSnapshot(2), 11);     // driver
-        err1a.addAllow(new StateSnapshot(0), 9);      // coord sensor
+        err1a.addAllow(new StateSnapshot(0), 7);      // trbp
         pvObj.addError(&err1a);
         
         StoppingState err1b(startPoint);
         err1b.addAllow(new StateSnapshot(2), 11);     // driver
-        err1b.addAllow(new StateSnapshot(1), 9);      // coord sensor
+        err1b.addAllow(new StateSnapshot(1), 7);      // trbp
         pvObj.addError(&err1b);
         
-        // When emergency is detected, cruise control is not reset
+        // Cruise control is being engaged when trbp is not started
         StoppingState err2a(startPoint);
-        err2a.addAllow(new StateSnapshot(1), 10);    // sensor front
-        err2a.addAllow(new StateSnapshot(1), 6);     // icc merge
+        err2a.addAllow(new StateSnapshot(0), 7);    // trbp
+        err2a.addAllow(new StateSnapshot(1), 8);    // icc merge
         pvObj.addError(&err2a);
 
         StoppingState err2b(startPoint);
-        err2b.addAllow(new StateSnapshot(1), 10);    // sensor front
-        err2b.addAllow(new StateSnapshot(1), 7);     // icc front
+        err2b.addAllow(new StateSnapshot(0), 7);    // trbp
+        err2b.addAllow(new StateSnapshot(1), 9);    // icc front
         pvObj.addError(&err2b);
         
         StoppingState err2c(startPoint);
-        err2c.addAllow(new StateSnapshot(1), 10);    // sensor front
-        err2c.addAllow(new StateSnapshot(1), 8);     // icc back
+        err2c.addAllow(new StateSnapshot(0), 7);    // trbp
+        err2c.addAllow(new StateSnapshot(1), 10);   // icc back
         pvObj.addError(&err2c);
         
         // Driver is not notified when emergency takes place
         StoppingState err3a(startPoint);
-        err3a.addAllow(new StateSnapshot(1), 10);    // sensor front
-        err3a.addAllow(new StateSnapshot(1), 11);    // driver
+        err3a.addAllow(new StateSnapshot(1), 7);    // trbp
+        err3a.addAllow(new StateSnapshot(1), 11);   // driver
         //pvObj.addError(&err3a);
         
         StoppingState err3b(startPoint);
-        err3b.addAllow(new StateSnapshot(1), 10);    // sensor front
-        err3b.addAllow(new StateSnapshot(2), 11);    // driver
+        err3b.addAllow(new StateSnapshot(1), 7);    // trbp
+        err3b.addAllow(new StateSnapshot(2), 11);   // driver
         pvObj.addError(&err3b);
         
         // Driver is changing lanes but either the periodic update or the lock protocol
         // is not operating
         StoppingState err4a(startPoint);
-        err4a.addAllow(new StateSnapshot(2), 11);    // driver
-        err4a.addAllow(new StateSnapshot(0), 5);     // periodic
+        err4a.addAllow(new StateSnapshot(2), 11);   // driver
+        err4a.addAllow(new StateSnapshot(0), 6) ;   // lock 2
         pvObj.addError(&err4a);
         
+        StoppingState err4b(startPoint);
+        err4b.addAllow(new StateSnapshot(2), 11);   // driver
+        err4b.addAllow(new StateSnapshot(1), 6) ;   // lock 2
+        pvObj.addError(&err4b);
+        
+        StoppingState err4c(startPoint);
+        err4c.addAllow(new StateSnapshot(2), 11);   // driver
+        err4c.addAllow(new StateSnapshot(2), 6) ;   // lock 2
+        pvObj.addError(&err4c);
+        
         StoppingState err4d(startPoint);
-        err4d.addAllow(new StateSnapshot(2), 11);    // driver
-        err4d.addAllow(new StateSnapshot(0), 4);     // lock
+        err4d.addAllow(new StateSnapshot(2), 11);   // driver
+        err4d.addAllow(new StateSnapshot(3), 6) ;   // lock 2
         pvObj.addError(&err4d);
 
         StoppingState err4e(startPoint);
-        err4e.addAllow(new StateSnapshot(2), 11);    // driver
-        err4e.addAllow(new StateSnapshot(1), 4);     // lock
+        err4e.addAllow(new StateSnapshot(2), 11);   // driver
+        err4e.addAllow(new StateSnapshot(4), 6) ;   // lock 2
         pvObj.addError(&err4e);
+
         
         // Driver is cleared to move but the cruise control is reset
         StoppingState err5a(startPoint);
-        err5a.addAllow(new StateSnapshot(2), 11);    // driver
-        err5a.addAllow(new StateSnapshot(0), 6);     // icc merge
+        err5a.addAllow(new StateSnapshot(2), 11);   // driver
+        err5a.addAllow(new StateSnapshot(0), 8);    // icc merge
         pvObj.addError(&err5a);
 
         StoppingState err5b(startPoint);
-        err5b.addAllow(new StateSnapshot(2), 11);    // driver
-        err5b.addAllow(new StateSnapshot(0), 7);     // icc front
+        err5b.addAllow(new StateSnapshot(2), 11);   // driver
+        err5b.addAllow(new StateSnapshot(0), 9);    // icc front
         pvObj.addError(&err5b);
         
         StoppingState err5c(startPoint);
-        err5c.addAllow(new StateSnapshot(2), 11);    // driver
-        err5c.addAllow(new StateSnapshot(0), 8);     // icc back
+        err5c.addAllow(new StateSnapshot(2), 11);   // driver
+        err5c.addAllow(new StateSnapshot(0), 10);   // icc back
         pvObj.addError(&err5c);
         
-        // Specify the error states
-        // One of the slaves is not locked
-        /*
-         StoppingState lock3FFree(startPoint) ;
-         lock3FFree.addAllow(new LockSnapshot(-1,-1,-1,-1,0), 1); // lock 0 in state 0
-         lock3FFree.addAllow(new LockSnapshot(10,0,1,-1,4), 3); // lock 2 in state 4
-         pvObj.addError(&lock3FFree);
-         */
+        
+        // Driver is shown green light but the cruise control is in collision
+        // avoidance mode
+        StoppingState err6a(startPoint);
+        err6a.addAllow(new StateSnapshot(2), 11);   // driver
+        err6a.addAllow(new StateSnapshot(2), 8);    // icc merge
+        pvObj.addError(&err6a);
+        
+        StoppingState err6b(startPoint);
+        err6b.addAllow(new StateSnapshot(2), 11);   // driver
+        err6b.addAllow(new StateSnapshot(2), 9);    // icc front
+        pvObj.addError(&err6b);
+        
+        StoppingState err6c(startPoint);
+        err6c.addAllow(new StateSnapshot(2), 11);   // driver
+        err6c.addAllow(new StateSnapshot(2), 10);   // icc back
+        pvObj.addError(&err6c);
         
         pvObj.addPrintStop(printStop) ;
         
@@ -263,13 +282,13 @@ int main( int argc, char* argv[] )
         delete merge;
         delete front;
         delete back;
-        delete lock;
-        delete period;
+        delete lock0;
+        delete lock1;
+        delete lock2;
         delete iccm;
         delete iccf ;
         delete iccb;
-        delete coord;
-        delete sensf ;
+        delete trbp;
         
         delete startPoint;
         

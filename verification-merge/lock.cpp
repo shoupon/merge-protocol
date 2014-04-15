@@ -168,6 +168,18 @@ MessageTuple* Lock::createSuccMsg()
     return msg;
 }
 
+string LockMessage::toString()
+{
+    stringstream ss;
+    ss << MessageTuple::toString() << "(" << _body << ")" ;
+    return ss.str();
+}
+
+LockMessage* LockMessage::clone() const
+{
+    return new LockMessage(*this);
+}
+
 string LockSnapshot::toString()
 {
     stringstream ss;
