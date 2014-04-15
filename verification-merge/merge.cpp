@@ -42,6 +42,8 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs, bool &hi
             if( msg == DEADLINE ) {
                 int did = inMsg->getParam(1) ;
                 assert(did == 0);
+                outMsgs.push_back(createOutput(inMsg, machineToInt(DRIVER_NAME),
+                                               messageToInt(ABORT)));
                 _state = 0;
                 return 3;
             }
@@ -67,10 +69,9 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs, bool &hi
             if( msg == DEADLINE ) {
                 int did = inMsg->getParam(1) ;
                 if( did == 1 || did == 0) {
-                    MessageTuple* tmsg = createOutput(inMsg, machineToInt(TRBP_NAME),
-                                                      messageToInt(STOP));
-                    outMsgs.push_back(tmsg);
-                    _state = 0;
+                    outMsgs.push_back(createOutput(inMsg, machineToInt(DRIVER_NAME),
+                                               messageToInt(ABORT)));
+                    _state = 8;
                     return 3;
                 }
                 else
@@ -198,7 +199,8 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs, bool &hi
                 if(did == 1) {
                     outMsgs.push_back(createOutput(inMsg, machineToInt(TRBP_NAME),
                                                    messageToInt(STOP)));
-                    return 0;
+                    _state = 0;
+                    return 3;
                 }
                 else
                     return 3;

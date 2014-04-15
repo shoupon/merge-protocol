@@ -27,8 +27,8 @@ int TRBP::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &hi
         return -1;
     switch (_state) {
         case 0:
-            if( msg == "START" ) {
-                assert(src == "merge");
+            if( msg == START ) {
+                assert(src == MERGE_NAME);
                 _state = 1;
                 return 3;
             }
@@ -38,8 +38,8 @@ int TRBP::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &hi
                 return -1;
             break;
         case 1:
-            if( msg == "STOP" ) {
-                assert(src == "merge") ;
+            if( msg == STOP ) {
+                assert(src == MERGE_NAME) ;
                 _state = 0 ;
                 return 3;
             }
@@ -49,8 +49,8 @@ int TRBP::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &hi
                 return -1;
             break;
         case 2:
-            if( msg == "STOP" ) {
-                assert(src == "merge");
+            if( msg == STOP ) {
+                assert(src == MERGE_NAME);
                 _state = 0;
                 return 3;
             }

@@ -58,6 +58,11 @@ int Cruise::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &
             else
                 return -1;
             break;
+        case 2:
+            if( msg == DEADLINE )
+                return 3;
+            else
+                return -1;
         default:
             return -1;
             break;

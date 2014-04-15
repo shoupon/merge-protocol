@@ -29,10 +29,13 @@ int Back::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &hi
     switch (_state) {
         case 0:
             if( msg == COOPERATE ) {
-                assert(src == LOCK_0_NAME) ;
+                if(src != LOCK_0_NAME) 
+                    return 3;
                 _state = 1;
                 return 3;
             }
+            else if( msg == DEADLINE )
+                return 3;
             else
                 return -1;
             break;

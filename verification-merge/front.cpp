@@ -29,10 +29,12 @@ int Front::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &h
     switch (_state) {
         case 0:
             if( msg == COOPERATE ) {
-                assert(src == LOCK_0_NAME) ;
+                if(src != LOCK_0_NAME) 
+                    return 3;
                 _state = 1;
                 return 3;
             }
+            
             else
                 return 3;
             break;
