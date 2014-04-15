@@ -86,9 +86,7 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs, bool &hi
             }
             else if( msg == CANCEL) {
                 assert(src == DRIVER_NAME) ;
-                outMsgs.push_back(createOutput(inMsg, machineToInt(TRBP_NAME),
-                                               messageToInt(STOP)));
-                _state = 0 ;
+                _state = 8;
                 return 3;
             }
             else
@@ -115,7 +113,7 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs, bool &hi
             else if( msg == CANCEL) {
                 assert(src == DRIVER_NAME);
                 cancelSeq(inMsg, outMsgs);
-                _state = 0 ;
+                _state = 8 ;
                 return 3;
             }
             else
@@ -143,7 +141,7 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs, bool &hi
             else if( msg == CANCEL ) {
                 assert(src == DRIVER_NAME);
                 cancelSeq(inMsg, outMsgs);
-                _state = 0 ;
+                _state = 8 ;
                 return 3;
             }
             else
@@ -194,6 +192,20 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs, bool &hi
             else
                 return -1;
             break;
+        case 8:
+            if( msg == DEADLINE ) {
+                int did = inMsg->getParam(1) ;
+                if(did == 1) {
+                    outMsgs.push_back(createOutput(inMsg, machineToInt(TRBP_NAME),
+                                                   messageToInt(STOP)));
+                    return 0;
+                }
+                else
+                    return 3;
+            }
+            else
+                return -1;
+            break ;
         default:
             return -1;
             break;
@@ -234,8 +246,6 @@ void Merge::abortSeq(MessageTuple* inMsg, vector<MessageTuple*>& outMsgs)
 
 void Merge::cancelSeq(MessageTuple* inMsg, vector<MessageTuple*>& outMsgs)
 {
-    outMsgs.push_back(createOutput(inMsg, machineToInt(TRBP_NAME),
-                                   messageToInt(STOP)));
     outMsgs.push_back(createOutput(inMsg, machineToInt(CRUISE_MERGE_NAME),
                                    messageToInt(RESET)));
 }
