@@ -76,14 +76,15 @@ int TRBP::nullInputTrans(vector<MessageTuple *> &outMsgs, bool &high_prob, int s
             return -1;
         case 1:
             if( startIdx == 1 ) {
-                outMsgs.push_back(createMsg(0, "merge", "READY"));
+                outMsgs.push_back(createMsg(0, MERGE_NAME, GAPREADY));
                 return 3;
             }
         case 2:
             if( startIdx == 0 ) {
-                outMsgs.push_back(emergency("merge"));
-                outMsgs.push_back(emergency("front"));
-                outMsgs.push_back(emergency("back"));
+                outMsgs.push_back(emergency(MERGE_NAME));
+                outMsgs.push_back(emergency(FRONT_NAME));
+                outMsgs.push_back(emergency(BACK_NAME));
+                _state = 0;
                 high_prob = false;
                 return 1;
             }
