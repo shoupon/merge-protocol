@@ -31,7 +31,7 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs, bool &hi
                 assert(src == DRIVER_NAME ) ;
                 // Set D0
                 outMsgs.push_back(createSetMsg(inMsg, 0)) ;
-                outMsgs.push_back(createLockMsg(inMsg, REQUEST));
+                outMsgs.push_back(createLockMsg(inMsg, REQUEST, 0));
                 _state = 1;
                 return 3;
             }
@@ -46,9 +46,9 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs, bool &hi
                 return 3;
             }
             else if( msg == SUCCESS ) {
-                assert(src == LOCK_NAME) ;
+                assert(src == LOCK_0_NAME) ;
                 outMsgs.push_back(createSetMsg(inMsg, 1)) ;
-                outMsgs.push_back(createLockMsg(inMsg, CREATE)) ;
+                outMsgs.push_back(createLockMsg(inMsg, CREATE, 1)) ;
                 MessageTuple* tmsg = createOutput(inMsg, machineToInt(TRBP_NAME),
                                                   messageToInt(START));
                 outMsgs.push_back(tmsg);
@@ -77,9 +77,7 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs, bool &hi
                     assert(false);
             }
             else if( msg == SUCCESS ) {
-                assert(src == LOCK_NAME) ;
-                outMsgs.push_back(createSetMsg(inMsg, 1)) ;
-                outMsgs.push_back(createLockMsg(inMsg, CREATE)) ;
+                assert(src == LOCK_1_NAME) ;
                 MessageTuple* cmsg = createOutput(inMsg, machineToInt(CRUISE_MERGE_NAME),
                                                   messageToInt(ALIGN));
                 outMsgs.push_back(cmsg);
@@ -100,7 +98,7 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs, bool &hi
             if( msg == GAPREADY ) {
                 assert(src == TRBP_NAME);
                 outMsgs.push_back(createSetMsg(inMsg, 2));
-                outMsgs.push_back(createLockMsg(inMsg, MOVE));
+                outMsgs.push_back(createLockMsg(inMsg, MOVE, 2));
                 _state = 4;
                 return 3;
             }
@@ -125,7 +123,7 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs, bool &hi
             break;
         case 4:
             if( msg == SUCCESS ) {
-                assert(src == LOCK_NAME) ;
+                assert(src == LOCK_2_NAME) ;
                 outMsgs.push_back(createOutput(inMsg, machineToInt(DRIVER_NAME),
                                                messageToInt(GREENLIGHT))) ;
                 _state = 4;
@@ -245,9 +243,11 @@ SyncMessage* Merge::createSetMsg(MessageTuple *inMsg, int did)
                            macId(), true, did);
 }
 
-LockMessage* Merge::createLockMsg(MessageTuple *inMsg, string purpose)
+LockMessage* Merge::createLockMsg(MessageTuple *inMsg, string purpose, int did)
 {
-    return new LockMessage(inMsg->srcID(), machineToInt(LOCK_NAME),
+    stringstream ss;
+    ss << LOCK_NAME << "(" << did << ")" ;
+    return new LockMessage(inMsg->srcID(), machineToInt(ss.str()),
                            inMsg->srcMsgId(), messageToInt(ATTEMPT),
                            macId(), purpose) ;
 }

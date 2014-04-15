@@ -11,6 +11,7 @@
 
 #include <iostream>
 #include <string>
+#include <sstream>
 using namespace std;
 
 #include "../prob_verify/statemachine.h"
@@ -35,7 +36,7 @@ private:
     void cancelSeq(MessageTuple* inMsg, vector<MessageTuple*>& outMsgs);
     MessageTuple* createOutput(MessageTuple* inMsg, int dest, int destMsg);
     SyncMessage* createSetMsg(MessageTuple* inMsg, int did);
-    LockMessage* createLockMsg(MessageTuple* inMsg, string purpose) ;
+    LockMessage* createLockMsg(MessageTuple* inMsg, string purpose, int did) ;
 };
 
 #endif 

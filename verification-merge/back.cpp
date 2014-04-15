@@ -29,7 +29,7 @@ int Back::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &hi
     switch (_state) {
         case 0:
             if( msg == COOPERATE ) {
-                assert(src == LOCK_NAME) ;
+                assert(src == LOCK_0_NAME) ;
                 _state = 1;
                 return 3;
             }
@@ -47,7 +47,7 @@ int Back::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &hi
                     return -1;
             }
             else if( msg == COOPERATE ) {
-                assert(src == LOCK_NAME) ;
+                assert(src == LOCK_1_NAME) ;
                 _state = 2;
                 outMsgs.push_back(new MessageTuple(inMsg->srcID(),
                                                    machineToInt(CRUISE_BACK_NAME),
@@ -85,7 +85,7 @@ int Back::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &hi
                 return 3 ;
             }
             else if( msg == COOPERATE ) {
-                assert(src == LOCK_NAME);
+                assert(src == LOCK_2_NAME);
                 _state = 3;
                 return 3;
             }

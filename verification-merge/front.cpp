@@ -29,7 +29,7 @@ int Front::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &h
     switch (_state) {
         case 0:
             if( msg == COOPERATE ) {
-                assert(src == LOCK_NAME) ;
+                assert(src == LOCK_0_NAME) ;
                 _state = 1;
                 return 3;
             }
@@ -44,7 +44,7 @@ int Front::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &h
                 return 3;
             }
             else if( msg == COOPERATE ) {
-                assert(src == LOCK_NAME) ;
+                assert(src == LOCK_1_NAME) ;
                 outMsgs.push_back(new MessageTuple(inMsg->srcID(),
                                                    machineToInt(CRUISE_FRONT_NAME),
                                                    inMsg->srcMsgId(),
@@ -75,7 +75,7 @@ int Front::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &h
                     return -1;
             }
             else if( msg == COOPERATE ) {
-                assert(src == LOCK_NAME);
+                assert(src == LOCK_2_NAME);
                 _state = 3;
                 return 3;
             }

@@ -13,9 +13,7 @@
 Lock::Lock( Lookup* msg, Lookup* mac, int did ): StateMachine(msg, mac)
 {
     stringstream ss;
-    ss << "lock(" ;
-    ss << did ;
-    ss << ")" ;
+    ss << LOCK_NAME << "(" << did << ")";
     setId(machineToInt(ss.str()));
     reset();
 }

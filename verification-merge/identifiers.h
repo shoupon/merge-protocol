@@ -11,6 +11,9 @@
 
 // List of machine names
 #define LOCK_NAME "lock"
+#define LOCK_0_NAME "lock(0)"
+#define LOCK_1_NAME "lock(1)"
+#define LOCK_2_NAME "lock(2)"
 #define CRUISE_FRONT_NAME "cruise(f)"
 #define CRUISE_BACK_NAME "cruise(b)"
 #define CRUISE_MERGE_NAME "cruise(m)"

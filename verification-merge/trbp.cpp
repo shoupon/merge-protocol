@@ -9,22 +9,10 @@
 #include "trbp.h"
 
 
-//
-//  periodic.cpp
-//  verification-merge
-//
-//  Created by Shou-pon Lin on 8/23/13.
-//  Copyright (c) 2013 Shou-pon Lin. All rights reserved.
-//
-
-#include "trbp.h"
-#include "../prob_verify/sync.h"
-
-
 
 TRBP::TRBP( Lookup* msg, Lookup* mac ):StateMachine(msg, mac)
 {
-    setId(machineToInt("periodic")) ;
+    setId(machineToInt(TRBP_NAME)) ;
     reset();
 }
 

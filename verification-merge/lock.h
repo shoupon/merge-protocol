@@ -14,6 +14,7 @@
 using namespace std;
 
 #include "../prob_verify/statemachine.h"
+#include "identifiers.h"
 
 
 class LockSnapshot;
