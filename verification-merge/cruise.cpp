@@ -37,6 +37,11 @@ int Cruise::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &
                 _state = 1;
                 return 3;
             }
+            else if( msg == PILOT ) {
+                assert(src == _name);
+                _state = 2;
+                return 3;
+            }
             else if( msg == DEADLINE )
                 return 3;
             else
