@@ -112,6 +112,8 @@ int Back::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &hi
                 _state = 0 ;
                 return 3;
             }
+            else if (msg == DEADLINE) 
+                return 3;
             else
                 return -1;
         default:

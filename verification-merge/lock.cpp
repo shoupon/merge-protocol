@@ -40,8 +40,10 @@ int Lock::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &hi
                 _state = 1;
                 return 3;
             }
-            else
+            else if (msg == DEADLINE)
                 return 3;
+            else
+                return -1;
             break;
         case 1:
         case 2:
@@ -58,7 +60,8 @@ int Lock::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &hi
                 else
                     return 3;
             }
-            return 3;
+            else
+                return -1;
             break ;
         default:
             assert(false);

@@ -40,10 +40,13 @@ int Front::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &h
             break;
         case 1:
             if( msg == DEADLINE ) {
-                int did = inMsg->getParam(1) ;
-                assert(did == 0);
-                _state = 0;
-                return 3;
+                int did = inMsg->getParam(1);
+                if( did == 0 ) {
+                    _state = 0;
+                    return 3;
+                }
+                else
+                    return -1;
             }
             else if( msg == COOPERATE ) {
                 assert(src == LOCK_1_NAME) ;
@@ -112,6 +115,8 @@ int Front::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &h
                 _state = 0 ;
                 return 3;
             }
+            else if (msg == DEADLINE)
+                return 3;
             else
                 return -1;
             break;
