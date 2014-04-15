@@ -23,6 +23,8 @@ public:
                 bool& high_prob, int startIdx = 0);
     int nullInputTrans(vector<MessageTuple*>& outMsgs,
                        bool& high_prob, int startIdx = 0) {return -1;}
+private:
+    bool isEmergency(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs);
 };
 
 #endif /* defined(BACK_H) */

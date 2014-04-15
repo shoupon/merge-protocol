@@ -74,16 +74,8 @@ int Back::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &hi
                 _state = 0;
                 return 3;
             }
-            else if( msg == EMERGENCY ) {
-                assert(src == TRBP_NAME) ;
-                outMsgs.push_back(new MessageTuple(inMsg->srcID(),
-                                                   machineToInt(CRUISE_BACK_NAME),
-                                                   inMsg->srcMsgId(),
-                                                   messageToInt(PILOT),
-                                                   macId()));
-                _state = 4;
-                return 3 ;
-            }
+            else if( isEmergency(inMsg, outMsgs) )
+                return 3;
             else if( msg == COOPERATE ) {
                 assert(src == LOCK_2_NAME);
                 _state = 3;
@@ -107,16 +99,8 @@ int Back::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &hi
                 _state = 0 ;
                 return 3;
             }
-            else if( msg == EMERGENCY ) {
-                assert(src == TRBP_NAME) ;
-                outMsgs.push_back(new MessageTuple(inMsg->srcID(),
-                                                   machineToInt(CRUISE_BACK_NAME),
-                                                   inMsg->srcMsgId(),
-                                                   messageToInt(PILOT),
-                                                   macId()));
-                _state = 4;
-                return 3 ;
-            }
+            else if( isEmergency(inMsg, outMsgs) )
+                return 3;
             else
                 return -1;
         case 4:
@@ -132,4 +116,22 @@ int Back::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &hi
             break;
     }
     return -1;
+}
+
+
+bool Back::isEmergency(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs) {
+    string msg = IntToMessage(inMsg->destMsgId()) ;
+    string src = IntToMachine(inMsg->subjectId()) ;
+    if( msg == EMERGENCY ) {
+        assert(src == TRBP_NAME) ;
+        outMsgs.push_back(new MessageTuple(inMsg->srcID(),
+                                           machineToInt(CRUISE_BACK_NAME),
+                                           inMsg->srcMsgId(),
+                                           messageToInt(PILOT),
+                                           macId()));
+        _state = 4;
+        return true;
+    }
+    else
+        return false;
 }

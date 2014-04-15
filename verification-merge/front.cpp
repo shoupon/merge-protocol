@@ -79,16 +79,8 @@ int Front::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &h
                 _state = 3;
                 return 3;
             }
-            else if( msg == EMERGENCY ) {
-                assert(src == TRBP_NAME);
-                outMsgs.push_back(new MessageTuple(inMsg->srcID(),
-                                                   machineToInt(CRUISE_FRONT_NAME),
-                                                   inMsg->srcMsgId(),
-                                                   messageToInt(PILOT),
-                                                   macId()));
-                _state = 4 ;
+            else if( isEmergency(inMsg, outMsgs) )
                 return 3;
-            }
             else
                 return -1;
             break;
@@ -107,16 +99,8 @@ int Front::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &h
                 _state = 4 ;
                 return 3;
             }
-            else if( msg == EMERGENCY ) {
-                assert(src == TRBP_NAME);
-                outMsgs.push_back(new MessageTuple(inMsg->srcID(),
-                                                   machineToInt(CRUISE_FRONT_NAME),
-                                                   inMsg->srcMsgId(),
-                                                   messageToInt(PILOT),
-                                                   macId()));
-                _state = 0 ;
+            else if( isEmergency(inMsg, outMsgs) )
                 return 3;
-            }
             else
                 return -1;
             break;
@@ -134,4 +118,21 @@ int Front::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &h
             break;
     }
     return -1;
+}
+
+bool Front::isEmergency(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs) {
+    string msg = IntToMessage(inMsg->destMsgId()) ;
+    string src = IntToMachine(inMsg->subjectId()) ;
+    if( msg == EMERGENCY ) {
+        assert(src == TRBP_NAME) ;
+        outMsgs.push_back(new MessageTuple(inMsg->srcID(),
+                                           machineToInt(CRUISE_FRONT_NAME),
+                                           inMsg->srcMsgId(),
+                                           messageToInt(PILOT),
+                                           macId()));
+        _state = 4;
+        return true;
+    }
+    else
+        return false;
 }

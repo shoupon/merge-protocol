@@ -185,6 +185,15 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs, bool &hi
             else
                 return 3;
             break ;
+        case 7:
+            if( msg == DISENGAGE ) {
+                assert( src == CRUISE_MERGE_NAME ) ;
+                _state = 0;
+                return 3;
+            }
+            else
+                return -1;
+            break;
         default:
             return -1;
             break;
