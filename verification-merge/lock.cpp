@@ -10,7 +10,8 @@
 #include "../prob_verify/statemachine.h"
 
 
-Lock::Lock( Lookup* msg, Lookup* mac, int did ): StateMachine(msg, mac)
+Lock::Lock( Lookup* msg, Lookup* mac, int did )
+: StateMachine(msg, mac), _did(did)
 {
     stringstream ss;
     ss << LOCK_NAME << "(" << did << ")";

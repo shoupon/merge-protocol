@@ -31,7 +31,7 @@ public:
                        bool& high_prob, int startIdx = 0);
     void restore(const StateSnapshot* snapshot);
     StateSnapshot* curState();
-    void reset() { _did = -1; _purpose = "" ; _state = 0; }
+    void reset() { _purpose = "" ; _state = 0; }
 private:
     string _purpose;
     int _did; // deadline number
