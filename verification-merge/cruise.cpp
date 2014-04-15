@@ -37,20 +37,24 @@ int Cruise::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &
                 _state = 1;
                 return 3;
             }
+            else if( msg == DEADLINE )
+                return 3;
             else
                 return -1;
             break;
         case 1:
-            if( msg == "RESET" ) {
+            if( msg == RESET ) {
                 assert(src == _name) ;
                 _state = 0 ;
                 return 3;
             }
-            else if( msg == "PILOT" ) {
+            else if( msg == PILOT ) {
                 assert(src == _name);
                 _state = 2;
                 return 3;
             }
+            else if( msg == DEADLINE )
+                return 3;
             else
                 return -1;
             break;
@@ -72,7 +76,7 @@ int Cruise::nullInputTrans(vector<MessageTuple *> &outMsgs, bool &high_prob, int
             // models the driver deactivating collision avoidance mode
             _state = 0;
             outMsgs.push_back(new MessageTuple(0, machineToInt(_name),
-                                               0, messageToInt("DISENGAGE"), macId()));
+                                               0, messageToInt(DISENGAGE), macId()));
             return 3;
             break;
             

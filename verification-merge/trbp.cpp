@@ -9,7 +9,6 @@
 #include "trbp.h"
 
 
-
 TRBP::TRBP( Lookup* msg, Lookup* mac ):StateMachine(msg, mac)
 {
     setId(machineToInt(TRBP_NAME)) ;
@@ -33,6 +32,8 @@ int TRBP::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &hi
                 _state = 1;
                 return 3;
             }
+            else if( msg == DEADLINE )
+                return 3;
             else
                 return -1;
             break;
@@ -42,6 +43,8 @@ int TRBP::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &hi
                 _state = 0 ;
                 return 3;
             }
+            else if( msg == DEADLINE )
+                return 3;
             else
                 return -1;
             break;
@@ -51,6 +54,8 @@ int TRBP::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &hi
                 _state = 0;
                 return 3;
             }
+            else if( msg == DEADLINE )
+                return 3;
             else
                 return -1;
             break;

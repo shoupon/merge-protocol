@@ -40,6 +40,8 @@ int Driver::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs,
                 _state = 2;
                 return 3;
             }
+            else if( msg == DEADLINE )
+                return 3;
             else
                 return 3;
             break;
@@ -49,6 +51,8 @@ int Driver::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs,
                 _state = 0 ;
                 return 3;
             }
+            else if( msg == DEADLINE )
+                return 3;
             else
                 return 3;
         default:
