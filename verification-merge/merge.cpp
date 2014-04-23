@@ -45,7 +45,7 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs, bool &hi
                 int did = inMsg->getParam(1) ;
                 assert(did == 0);
                 outMsgs.push_back(createOutput(inMsg, machineToInt(DRIVER_NAME),
-                                               messageToInt(ABORT)));
+                                               messageToInt(FAILURE)));
                 _state = 0;
                 return 3;
             }
@@ -72,7 +72,7 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs, bool &hi
                 int did = inMsg->getParam(1) ;
                 if( did == 1 || did == 0) {
                     outMsgs.push_back(createOutput(inMsg, machineToInt(DRIVER_NAME),
-                                               messageToInt(ABORT)));
+                                                   messageToInt(FAILURE)));
                     _state = 8;
                     return 3;
                 }
@@ -114,7 +114,12 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs, bool &hi
                 int did = inMsg->getParam(1) ;
                 if(did != 1)
                     return 3;
-                abortSeq(inMsg, outMsgs);
+                outMsgs.push_back(createOutput(inMsg, machineToInt(DRIVER_NAME),
+                                               messageToInt(FAILURE))) ;
+                outMsgs.push_back(createOutput(inMsg, machineToInt(CRUISE_MERGE_NAME),
+                                               messageToInt(RESET))) ;
+                outMsgs.push_back(createOutput(inMsg, machineToInt(TRBP_NAME),
+                                               messageToInt(STOP))) ;
                 _state = 0 ;
                 return 3;
             }
@@ -199,8 +204,10 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs, bool &hi
                 return 3;
             break ;
         case 7:
-            if( msg == DISENGAGE ) {
-                assert( src == CRUISE_MERGE_NAME ) ;
+            if( msg == DISABLE ) {
+                assert( src == DRIVER_NAME ) ;
+                outMsgs.push_back(createOutput(inMsg, machineToInt(CRUISE_MERGE_NAME),
+                                               messageToInt(DISENGAGE)));
                 _state = 0;
                 return 3;
             }
@@ -219,11 +226,47 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs, bool &hi
                 else
                     return 3;
             }
+            else if( msg == SUCCESS ) {
+                assert(src == LOCK_1_NAME) ;
+                return 3;
+            }
             else if( isEmergency(inMsg, outMsgs) )
                 return 3;
+            else if (msg == SIGNAL) {
+                _state = 9;
+                return 3;
+            }
             else
                 return -1;
             break ;
+        case 9:
+            if (msg == DEADLINE) {
+                int did = inMsg->getParam(1);
+                if (did == 1) {
+                    outMsgs.push_back(createOutput(inMsg, machineToInt(TRBP_NAME),
+                                                   messageToInt(STOP)));
+                    outMsgs.push_back(createOutput(inMsg, machineToInt(DRIVER_NAME),
+                                                   messageToInt(FAILURE)));
+                    _state = 0;
+                    return 3;
+                }
+                else
+                    return -1;
+            }
+            else if (msg == CANCEL) {
+                assert(src == DRIVER_NAME);
+                _state = 8;
+                return 3;
+            }
+            else if( msg == SUCCESS ) {
+                assert(src == LOCK_1_NAME) ;
+                return 3;
+            }
+            else if( isEmergency(inMsg, outMsgs) )
+                return 3;
+            else 
+                return -1;
+            break;
         default:
             return -1;
             break;

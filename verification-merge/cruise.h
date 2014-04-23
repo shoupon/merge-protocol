@@ -22,7 +22,7 @@ public:
     int transit(MessageTuple* inMsg, vector<MessageTuple*>& outMsgs,
                 bool& high_prob, int startIdx = 0);
     int nullInputTrans(vector<MessageTuple*>& outMsgs,
-                       bool& high_prob, int startIdx = 0);
+                       bool& high_prob, int startIdx = 0){return -1;}
 private:
     string _name;
     string _abbv;

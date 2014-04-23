@@ -114,12 +114,7 @@ int Back::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &hi
             else
                 return -1;
         case 4:
-            if( msg == DISENGAGE ) {
-                assert(src == CRUISE_BACK_NAME) ;
-                _state = 0 ;
-                return 3;
-            }
-            else if (msg == DEADLINE) 
+            if (msg == DEADLINE) 
                 return 3;
             else
                 return -1;
@@ -128,6 +123,24 @@ int Back::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &hi
             break;
     }
     return -1;
+}
+
+int Back::nullInputTrans(vector<MessageTuple *> &outMsgs, bool &high_prob, int startIdx)
+{
+    outMsgs.clear();
+    high_prob = true ;
+    if( startIdx != 0 )
+        return -1;
+    
+    switch (_state) {
+        case 4:
+            outMsgs.push_back(new MessageTuple(0, machineToInt(CRUISE_FRONT_NAME),
+                                               0, messageToInt(DISENGAGE),
+                                               macId()));
+        default:
+            return -1;
+            break;
+    }
 }
 
 

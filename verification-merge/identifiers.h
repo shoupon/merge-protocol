@@ -53,6 +53,8 @@
 #define ABORT "ABORT"
 #define FINISH "FINISH"
 #define GREENLIGHT "GREENLIGHT"
+#define DISABLE "DISABLE"
+#define FAILURE "FAILURE"
 // Merge
 #define REQUEST "REQUEST"
 #define CREATE "CREATE"
