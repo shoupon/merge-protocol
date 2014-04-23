@@ -116,6 +116,12 @@ int Back::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &hi
         case 4:
             if (msg == DEADLINE) 
                 return 3;
+            else if (msg == COOPERATE) {
+                if (src == LOCK_1_NAME)
+                    return 3;
+                else
+                    return -1;
+            }
             else
                 return -1;
         default:
