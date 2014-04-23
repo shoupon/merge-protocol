@@ -55,6 +55,7 @@
 #define GREENLIGHT "GREENLIGHT"
 #define DISABLE "DISABLE"
 #define FAILURE "FAILURE"
+#define NOTIFY "NOTIFY"
 // Merge
 #define REQUEST "REQUEST"
 #define CREATE "CREATE"

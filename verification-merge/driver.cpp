@@ -28,7 +28,13 @@ int Driver::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs,
     string src = IntToMachine(inMsg->subjectId());
     switch (_state) {
         case 0:
-            return 3;
+            if (msg == NOTIFY) {
+                assert(src == MERGE_NAME);
+                _state = 3;
+                return 3;
+            }
+            else
+                return 3;
         case 1:
             if( msg == ABORT ) {
                 assert(src == MERGE_NAME);

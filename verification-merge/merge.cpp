@@ -35,6 +35,9 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs, bool &hi
                 _state = 1;
                 return 3;
             }
+            else if (msg == SUCCESS) {
+                return 3;
+            }
             if (msg == DEADLINE)
                 return 3;
             else
@@ -211,6 +214,17 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs, bool &hi
                 _state = 0;
                 return 3;
             }
+            else if( msg == DEADLINE ) {
+                int did = inMsg->getParam(1) ;
+                if (did == 1 || did == 2) 
+                    return 3;
+                else
+                    return -1;
+            }
+            else if (msg == SUCCESS) {
+                assert(src == LOCK_1_NAME);
+                return 3;
+            }
             else
                 return -1;
             break;
@@ -230,8 +244,11 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs, bool &hi
                 assert(src == LOCK_1_NAME) ;
                 return 3;
             }
-            else if( isEmergency(inMsg, outMsgs) )
+            else if( isEmergency(inMsg, outMsgs) ) {
+                outMsgs.push_back(createOutput(inMsg, machineToInt(DRIVER_NAME),
+                                               messageToInt(NOTIFY)));
                 return 3;
+            }
             else if (msg == SIGNAL) {
                 _state = 9;
                 return 3;
