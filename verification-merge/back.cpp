@@ -36,6 +36,11 @@ int Back::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &hi
             }
             else if( msg == DEADLINE )
                 return 3;
+            else if( isEmergency(inMsg, outMsgs) ) {
+                outMsgs.clear();
+                _state = 0;
+                return 3;
+            }
             else
                 return -1;
             break;
@@ -59,6 +64,8 @@ int Back::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &hi
                                                    macId()));
                 return 3;
             }
+            else if( isEmergency(inMsg, outMsgs) )
+                return 3;
             else
                 return -1;
         case 2:

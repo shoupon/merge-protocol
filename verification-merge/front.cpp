@@ -34,7 +34,11 @@ int Front::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &h
                 _state = 1;
                 return 3;
             }
-            
+            else if( isEmergency(inMsg, outMsgs) ) {
+                outMsgs.clear();
+                _state = 0;
+                return 3;
+            }
             else
                 return 3;
             break;
@@ -58,6 +62,8 @@ int Front::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &h
                 _state = 2;
                 return 3;
             }
+            else if( isEmergency(inMsg, outMsgs) )
+                return 3;
             else
                 return -1;
             break;

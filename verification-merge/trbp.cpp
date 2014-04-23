@@ -43,12 +43,28 @@ int TRBP::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &hi
                 _state = 0 ;
                 return 3;
             }
+            else if (msg == MONITOR) {
+                assert(src == MERGE_NAME);
+                _state = 2;
+                return 3;
+            }
             else if( msg == DEADLINE )
                 return 3;
             else
                 return -1;
             break;
         case 2:
+            if( msg == STOP ) {
+                assert(src == MERGE_NAME) ;
+                _state = 0 ;
+                return 3;
+            }
+            else if( msg == DEADLINE )
+                return 3;
+            else
+                return -1;
+            break;
+        case 3:
             if( msg == STOP ) {
                 assert(src == MERGE_NAME);
                 _state = 0;
@@ -70,16 +86,18 @@ int TRBP::nullInputTrans(vector<MessageTuple *> &outMsgs, bool &high_prob, int s
     outMsgs.clear() ;
     if( _state != 1 )
         return -1;
-    high_prob = false;
+    high_prob = true;
     switch (_state) {
         case 0:
             return -1;
-        case 1:
+        case 2:
             if( startIdx == 1 ) {
                 outMsgs.push_back(createMsg(0, MERGE_NAME, GAPREADY));
+                _state = 2;
                 return 3;
             }
-        case 2:
+        case 1:
+        case 3:
             if( startIdx == 0 ) {
                 outMsgs.push_back(emergency(MERGE_NAME));
                 outMsgs.push_back(emergency(FRONT_NAME));
@@ -125,15 +143,15 @@ MessageTuple* TRBP::createMsg(MessageTuple *inMsg, const string& dest, string ms
 
 MessageTuple* TRBP::emergency(const string& dest)
 {
-    return createMsg(0, dest, "EMERGENCY");
+    return createMsg(0, dest, EMERGENCY);
 }
 
 MessageTuple* TRBP::gapTaken(const string& dest)
 {
-    return createMsg(0, dest, "GAPTAKEN");
+    return createMsg(0, dest, GAPTAKEN);
 }
 
 MessageTuple* TRBP::loss(const string &dest)
 {
-    return createMsg(0, dest, "COMMLOSS");
+    return createMsg(0, dest, COMMLOSS);
 }

@@ -83,7 +83,10 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs, bool &hi
                 assert(src == LOCK_1_NAME) ;
                 MessageTuple* cmsg = createOutput(inMsg, machineToInt(CRUISE_MERGE_NAME),
                                                   messageToInt(ALIGN));
+                MessageTuple* tmsg = createOutput(inMsg, machineToInt(TRBP_NAME),
+                                                  messageToInt(MONITOR));
                 outMsgs.push_back(cmsg);
+                outMsgs.push_back(tmsg);
                 _state = 3;
                 return 3;
             }
@@ -134,9 +137,16 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs, bool &hi
             }
             else if( msg == DEADLINE ) {
                 int did = inMsg->getParam(1) ;
-                if(did == 1 || did == 2) {
-                    abortSeq(inMsg, outMsgs);
-                    return 0;
+                assert(did < 2);
+                if(did == 1) {
+                    outMsgs.push_back(createOutput(inMsg, 
+                                                   machineToInt(DRIVER_NAME),
+                                                   messageToInt(ABORT)));   
+                    outMsgs.push_back(createOutput(inMsg, 
+                                                   machineToInt(CRUISE_MERGE_NAME),
+                                                   messageToInt(PILOT)));
+                    _state = 6;
+                    return 3;
                 }
                 else
                     return 3;
@@ -146,7 +156,7 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs, bool &hi
             else if( msg == CANCEL ) {
                 assert(src == DRIVER_NAME);
                 cancelSeq(inMsg, outMsgs);
-                _state = 8 ;
+                _state = 6 ;
                 return 3;
             }
             else
@@ -209,6 +219,8 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs, bool &hi
                 else
                     return 3;
             }
+            else if( isEmergency(inMsg, outMsgs) )
+                return 3;
             else
                 return -1;
             break ;

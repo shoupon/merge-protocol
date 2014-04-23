@@ -42,6 +42,7 @@
 #define COMMLOSS "COMM-LOSS"
 #define GAPREADY "GAP-READY"
 #define START "START"
+#define MONITOR "MONITOR"
 #define STOP "STOP"
 // Timing
 #define DEADLINE "DEADLINE"
