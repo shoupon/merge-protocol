@@ -25,7 +25,9 @@ int Front::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &h
     
     if( startIdx != 0 )
         return -1;
-    
+
+    if (msg == CLOCKFAIL)
+        return 3;
     switch (_state) {
         case 0:
             if( msg == COOPERATE ) {

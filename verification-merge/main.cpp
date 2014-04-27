@@ -118,7 +118,37 @@ int main( int argc, char* argv[] )
         
         // Add checker into ProbVerifier
         pvObj.addChecker(&mergeChk);
-        
+
+        // Create group of processes that are linked to the same timing stack
+        // (Group of processes that located within same agent)
+        vector<const StateMachine*> mergeCar;
+        mergeCar.push_back(merge);
+        mergeCar.push_back(trbp);
+        mergeCar.push_back(iccm);
+        mergeCar.push_back(lock0);
+        mergeCar.push_back(lock1);
+        mergeCar.push_back(lock2);
+        mergeCar.push_back(driver);
+        sync->addFailureGroup(mergeCar);
+        vector<const StateMachine*> frontCar;
+        frontCar.push_back(front);
+        frontCar.push_back(trbp);
+        frontCar.push_back(iccf);
+        frontCar.push_back(lock0);
+        frontCar.push_back(lock1);
+        frontCar.push_back(lock2);
+        frontCar.push_back(driver);
+        sync->addFailureGroup(frontCar);
+        vector<const StateMachine*> backCar;
+        backCar.push_back(back);
+        backCar.push_back(trbp);
+        backCar.push_back(iccf);
+        backCar.push_back(lock0);
+        backCar.push_back(lock1);
+        backCar.push_back(lock2);
+        backCar.push_back(driver);
+        sync->addFailureGroup(backCar);
+
         // Add a default service (stub)
         Service *srvc = new Service();
         srvc->reset();

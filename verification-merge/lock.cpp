@@ -29,7 +29,8 @@ int Lock::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &hi
     
     if( startIdx != 0 )
         return -1;
-    
+    if (msg == CLOCKFAIL)
+        return 3;
     switch (_state) {
         case 0:
             if( msg == "ATTEMPT" ) {
@@ -53,7 +54,8 @@ int Lock::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &hi
             if( msg == "DEADLINE") {
                 int did = inMsg->getParam(1);
                 if(did == _did){
-                    _state = 0 ;
+                    //_state = 0;
+                    reset();
                     //high_prob = false;
                     return 3;
                 }

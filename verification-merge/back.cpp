@@ -26,6 +26,9 @@ int Back::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &hi
     
     string msg = IntToMessage(inMsg->destMsgId()) ;
     string src = IntToMachine(inMsg->subjectId()) ;
+
+    if (msg == CLOCKFAIL)
+        return 3;
     switch (_state) {
         case 0:
             if( msg == COOPERATE ) {

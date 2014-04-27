@@ -26,6 +26,10 @@ int Driver::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs,
     
     string msg = IntToMessage(inMsg->destMsgId());
     string src = IntToMachine(inMsg->subjectId());
+    if (msg == CLOCKFAIL) {
+        _state = 4;
+        return 3;
+    }
     switch (_state) {
         case 0:
             if (msg == NOTIFY) {
@@ -71,6 +75,8 @@ int Driver::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs,
                 return 3;
             else
                 return 3;
+        case 4:
+            return 3;
         default:
             return -1;
             break;

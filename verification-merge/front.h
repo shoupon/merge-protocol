@@ -13,6 +13,7 @@
 #include <string>
 
 #include "../prob_verify/statemachine.h"
+#include "../prob_verify/sync.h"
 #include "identifiers.h"
 
 class Front: public StateMachine

@@ -34,6 +34,10 @@ int TRBP::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &hi
             }
             else if( msg == DEADLINE )
                 return 3;
+            else if (msg == CLOCKFAIL){
+                _state = 4;
+                return 3;
+            }
             else
                 return -1;
             break;
@@ -50,6 +54,13 @@ int TRBP::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &hi
             }
             else if( msg == DEADLINE )
                 return 3;
+            else if (msg == CLOCKFAIL) {
+                outMsgs.push_back(emergency(MERGE_NAME));
+                outMsgs.push_back(emergency(FRONT_NAME));
+                outMsgs.push_back(emergency(BACK_NAME));
+                _state = 4;
+                return 3;
+            }
             else
                 return -1;
             break;
@@ -61,6 +72,13 @@ int TRBP::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &hi
             }
             else if( msg == DEADLINE )
                 return 3;
+            else if (msg == CLOCKFAIL) {
+                outMsgs.push_back(emergency(MERGE_NAME));
+                outMsgs.push_back(emergency(FRONT_NAME));
+                outMsgs.push_back(emergency(BACK_NAME));
+                _state = 4;
+                return 3;
+            }
             else
                 return -1;
             break;
@@ -72,9 +90,22 @@ int TRBP::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &hi
             }
             else if( msg == DEADLINE )
                 return 3;
+            else if (msg == CLOCKFAIL) {
+                outMsgs.push_back(emergency(MERGE_NAME));
+                outMsgs.push_back(emergency(FRONT_NAME));
+                outMsgs.push_back(emergency(BACK_NAME));
+                _state = 4;
+                return 3;
+            }
             else
                 return -1;
             break;
+        case 4:
+            assert(msg != DEADLINE);
+            if (msg == CLOCKFAIL)
+                return 3;
+            else
+                return -1;
         default:
             return -1;
             break;

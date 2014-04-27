@@ -44,9 +44,6 @@
 #define START "START"
 #define MONITOR "MONITOR"
 #define STOP "STOP"
-// Timing
-#define DEADLINE "DEADLINE"
-#define SET "SET"
 // Driver
 #define SIGNAL "SIGNAL"
 #define CANCEL "CANCEL"
