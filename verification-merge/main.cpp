@@ -131,29 +131,29 @@ int main( int argc, char* argv[] )
         // Specify the global states in the set RS (stopping states)
         // initial state
         StoppingState stop1(startPoint);
-        stop1.addAllow(new StateSnapshot(0), 1) ;    // merge
-        stop1.addAllow(new StateSnapshot(0), 2) ;    // front
-        stop1.addAllow(new StateSnapshot(0), 3) ;    // back
-        stop1.addAllow(new StateSnapshot(0), 4) ;    // lock 0
-        stop1.addAllow(new StateSnapshot(0), 5) ;    // lock 1
-        stop1.addAllow(new StateSnapshot(0), 6) ;    // lock 2
-        stop1.addAllow(new StateSnapshot(0), 7) ;    // trbp
-        stop1.addAllow(new StateSnapshot(0), 8) ;    // icc merge
-        stop1.addAllow(new StateSnapshot(0), 9) ;    // icc front
-        stop1.addAllow(new StateSnapshot(0), 10) ;   // icc back
-        stop1.addAllow(new StateSnapshot(0), 11) ;   // driver
+        stop1.addAllow(new StateSnapshot(0), 1) ;      // merge
+        stop1.addAllow(new StateSnapshot(0), 2) ;      // front
+        stop1.addAllow(new StateSnapshot(0), 3) ;      // back
+        stop1.addAllow(new LockSnapshot(0,0,""), 4) ;    // lock 0
+        stop1.addAllow(new LockSnapshot(0,1,""), 5) ;    // lock 1
+        stop1.addAllow(new LockSnapshot(0,2,""), 6) ;    // lock 2
+        stop1.addAllow(new StateSnapshot(0), 7) ;      // trbp
+        stop1.addAllow(new StateSnapshot(0), 8) ;      // icc merge
+        stop1.addAllow(new StateSnapshot(0), 9) ;      // icc front
+        stop1.addAllow(new StateSnapshot(0), 10) ;     // icc back
+        stop1.addAllow(new StateSnapshot(0), 11) ;     // driver
         pvObj.addSTOP(&stop1);
         
         StoppingState stop2(startPoint);
-        stop1.addAllow(new StateSnapshot(5), 1) ;    // merge
-        stop1.addAllow(new StateSnapshot(3), 2) ;    // front
-        stop1.addAllow(new StateSnapshot(3), 3) ;    // back
-        stop1.addAllow(new StateSnapshot(5), 6) ;    // lock 2
-        stop1.addAllow(new StateSnapshot(2), 7) ;    // trbp
-        stop1.addAllow(new StateSnapshot(1), 8) ;    // icc merge
-        stop1.addAllow(new StateSnapshot(1), 9) ;    // icc front
-        stop1.addAllow(new StateSnapshot(1), 10) ;   // icc back
-        stop1.addAllow(new StateSnapshot(2), 11) ;   // driver
+        stop2.addAllow(new StateSnapshot(5), 1) ;      // merge
+        stop2.addAllow(new StateSnapshot(3), 2) ;      // front
+        stop2.addAllow(new StateSnapshot(3), 3) ;      // back
+        stop2.addAllow(new LockSnapshot(5,2,MOVE), 6) ; // lock 2
+        stop2.addAllow(new StateSnapshot(2), 7) ;      // trbp
+        stop2.addAllow(new StateSnapshot(1), 8) ;      // icc merge
+        stop2.addAllow(new StateSnapshot(1), 9) ;      // icc front
+        stop2.addAllow(new StateSnapshot(1), 10) ;     // icc back
+        stop2.addAllow(new StateSnapshot(2), 11) ;     // driver
         pvObj.addSTOP(&stop2);
         
         /*
