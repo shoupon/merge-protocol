@@ -100,8 +100,10 @@ int Back::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &hi
                 _state = 3;
                 return 3;
             }
-            else if (msg == CLOCKFAIL)
+            else if (msg == CLOCKFAIL){
+                _state = 5;
                 return 3;
+            }
             else
                 return -1;
             break ;
@@ -122,8 +124,10 @@ int Back::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &hi
             }
             else if( isEmergency(inMsg, outMsgs) )
                 return 3;
-            else if (msg == CLOCKFAIL)
+            else if (msg == CLOCKFAIL){
+                _state = 5;
                 return 3;
+            }
             else
                 return -1;
         case 4:
@@ -135,13 +139,20 @@ int Back::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &hi
                 else
                     return -1;
             }
-            else if (msg == CLOCKFAIL)
+            else if (msg == CLOCKFAIL){
+                _state = 5;
                 return 3;
+            }
             else
                 return -1;
             break;
         case 5:
-            return 3;
+            if( isEmergency(inMsg, outMsgs) ) {
+                _state = 5;
+                return 3;
+            }
+            else
+                return -1;
             break;
         default:
             return -1;

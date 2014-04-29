@@ -307,6 +307,10 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs, bool &hi
                 return -1;
             break;
         case 10:
+            if( isEmergency(inMsg, outMsgs) ){
+                _state = 10;
+                return 3;
+            }
         default:
             return -1;
             break;
