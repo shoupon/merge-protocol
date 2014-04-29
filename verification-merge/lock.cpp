@@ -54,9 +54,18 @@ int Lock::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &hi
             if( msg == "DEADLINE") {
                 int did = inMsg->getParam(1);
                 if(did == _did){
-                    //_state = 0;
+                    switch (_state) {
+                        case 1:
+                        case 2:
+                        case 3:
+                        case 4:
+                            high_prob = false;
+                            break;
+                        case 5:
+                            high_prob = true;
+                            break;
+                    }
                     reset();
-                    //high_prob = false;
                     return 3;
                 }
                 else
