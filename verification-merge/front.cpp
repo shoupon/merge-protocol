@@ -26,8 +26,6 @@ int Front::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &h
     if( startIdx != 0 )
         return -1;
 
-    if (msg == CLOCKFAIL)
-        return 3;
     switch (_state) {
         case 0:
             if( msg == COOPERATE ) {
@@ -39,6 +37,10 @@ int Front::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &h
             else if( isEmergency(inMsg, outMsgs) ) {
                 outMsgs.clear();
                 _state = 0;
+                return 3;
+            }
+            else if (msg == CLOCKFAIL) {
+                _state = 5;
                 return 3;
             }
             else
@@ -66,6 +68,10 @@ int Front::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &h
             }
             else if( isEmergency(inMsg, outMsgs) )
                 return 3;
+            else if (msg == CLOCKFAIL) {
+                _state = 5;
+                return 3;
+            }
             else
                 return -1;
             break;
@@ -94,6 +100,8 @@ int Front::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &h
             }
             else if( isEmergency(inMsg, outMsgs) )
                 return 3;
+            else if (msg == CLOCKFAIL)
+                return 3;
             else
                 return -1;
             break;
@@ -114,6 +122,8 @@ int Front::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &h
             }
             else if( isEmergency(inMsg, outMsgs) )
                 return 3;
+            else if (msg == CLOCKFAIL)
+                return 3;
             else
                 return -1;
             break;
@@ -126,8 +136,13 @@ int Front::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &h
                 else
                     return -1;
             }
+            else if (msg == CLOCKFAIL)
+                return 3;
             else
                 return -1;
+            break;
+        case 5:
+            return 3;
             break;
         default:
             return -1;
@@ -149,6 +164,9 @@ int Front::nullInputTrans(vector<MessageTuple *> &outMsgs, bool &high_prob, int 
             outMsgs.push_back(new MessageTuple(0, machineToInt(CRUISE_FRONT_NAME),
                                                0, messageToInt(DISENGAGE),
                                                macId()));
+            _state = 0;
+            return 3;
+            break;
         default:
             return -1;
             break;

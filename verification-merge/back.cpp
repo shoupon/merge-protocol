@@ -27,8 +27,6 @@ int Back::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &hi
     string msg = IntToMessage(inMsg->destMsgId()) ;
     string src = IntToMachine(inMsg->subjectId()) ;
 
-    if (msg == CLOCKFAIL)
-        return 3;
     switch (_state) {
         case 0:
             if( msg == COOPERATE ) {
@@ -42,6 +40,10 @@ int Back::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &hi
             else if( isEmergency(inMsg, outMsgs) ) {
                 outMsgs.clear();
                 _state = 0;
+                return 3;
+            }
+            else if (msg == CLOCKFAIL) {
+                _state = 5;
                 return 3;
             }
             else
@@ -65,6 +67,10 @@ int Back::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &hi
                                                    inMsg->srcMsgId(),
                                                    messageToInt(MAKEGAP),
                                                    macId()));
+                return 3;
+            }
+            else if (msg == CLOCKFAIL) {
+                _state = 5;
                 return 3;
             }
             else if( isEmergency(inMsg, outMsgs) )
@@ -94,6 +100,8 @@ int Back::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &hi
                 _state = 3;
                 return 3;
             }
+            else if (msg == CLOCKFAIL)
+                return 3;
             else
                 return -1;
             break ;
@@ -114,6 +122,8 @@ int Back::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &hi
             }
             else if( isEmergency(inMsg, outMsgs) )
                 return 3;
+            else if (msg == CLOCKFAIL)
+                return 3;
             else
                 return -1;
         case 4:
@@ -125,8 +135,14 @@ int Back::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &hi
                 else
                     return -1;
             }
+            else if (msg == CLOCKFAIL)
+                return 3;
             else
                 return -1;
+            break;
+        case 5:
+            return 3;
+            break;
         default:
             return -1;
             break;
@@ -143,9 +159,12 @@ int Back::nullInputTrans(vector<MessageTuple *> &outMsgs, bool &high_prob, int s
     
     switch (_state) {
         case 4:
-            outMsgs.push_back(new MessageTuple(0, machineToInt(CRUISE_FRONT_NAME),
+            outMsgs.push_back(new MessageTuple(0, machineToInt(CRUISE_BACK_NAME),
                                                0, messageToInt(DISENGAGE),
                                                macId()));
+            _state = 0;
+            return 3;
+            break;
         default:
             return -1;
             break;

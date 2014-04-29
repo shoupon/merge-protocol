@@ -25,8 +25,6 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs, bool &hi
     
     string msg = IntToMessage(inMsg->destMsgId()) ;
     string src = IntToMachine(inMsg->subjectId()) ;
-    if (msg == CLOCKFAIL)
-        return 3;
     switch (_state) {
         case 0:
             if( msg == SIGNAL ) {
@@ -40,7 +38,12 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs, bool &hi
             else if (msg == SUCCESS) {
                 return 3;
             }
-            if (msg == DEADLINE)
+            else if (msg == CLOCKFAIL) {
+                assert(src == SYNC_NAME);
+                _state = 10;
+                return 3;
+            }
+            else if (msg == DEADLINE)
                 return 3;
             else
                 return -1;
@@ -62,6 +65,11 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs, bool &hi
                                                   messageToInt(START));
                 outMsgs.push_back(tmsg);
                 _state = 2;
+                return 3;
+            }
+            else if (msg == CLOCKFAIL) {
+                assert(src == SYNC_NAME);
+                _state = 10;
                 return 3;
             }
             else if( msg == CANCEL) {
@@ -102,6 +110,8 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs, bool &hi
             }
             else if( isEmergency(inMsg, outMsgs) )
                 return 3;
+            else if (msg == CLOCKFAIL)
+                return 3;
             else
                 return 3;
             break;
@@ -113,8 +123,6 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs, bool &hi
                 _state = 4;
                 return 3;
             }
-            else if( isEmergency(inMsg, outMsgs) )
-                return 3;
             else if( msg == DEADLINE ) {
                 int did = inMsg->getParam(1) ;
                 if(did != 1)
@@ -134,6 +142,10 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs, bool &hi
                 _state = 8 ;
                 return 3;
             }
+            else if( isEmergency(inMsg, outMsgs) )
+                return 3;
+            else if (msg == CLOCKFAIL)
+                return 3;
             else
                 return -1;
             break;
@@ -161,14 +173,16 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs, bool &hi
                 else
                     return 3;
             }
-            else if(isEmergency(inMsg, outMsgs))
-                return 3;
             else if( msg == CANCEL ) {
                 assert(src == DRIVER_NAME);
                 cancelSeq(inMsg, outMsgs);
                 _state = 6 ;
                 return 3;
             }
+            else if(isEmergency(inMsg, outMsgs))
+                return 3;
+            else if (msg == CLOCKFAIL)
+                return 3;
             else
                 return -1;
             break;
@@ -191,6 +205,8 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs, bool &hi
             }
             else if( isEmergency(inMsg, outMsgs) )
                 return 3;
+            else if (msg == CLOCKFAIL)
+                return 3;
             else
                 return -1;
             break;
@@ -205,6 +221,8 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs, bool &hi
                 else
                     return 3;
             }
+            else if (msg == CLOCKFAIL)
+                return 3;
             else
                 return 3;
             break ;
@@ -222,6 +240,8 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs, bool &hi
                 assert(src == LOCK_1_NAME);
                 return 3;
             }
+            else if (msg == CLOCKFAIL)
+                return 3;
             else
                 return -1;
             break;
@@ -250,6 +270,8 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs, bool &hi
                 _state = 9;
                 return 3;
             }
+            else if (msg == CLOCKFAIL)
+                return 3;
             else
                 return -1;
             break ;
@@ -279,9 +301,12 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs, bool &hi
             }
             else if( isEmergency(inMsg, outMsgs) )
                 return 3;
+            else if (msg == CLOCKFAIL)
+                return 3;
             else 
                 return -1;
             break;
+        case 10:
         default:
             return -1;
             break;
