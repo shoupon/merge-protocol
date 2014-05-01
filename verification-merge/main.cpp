@@ -142,7 +142,7 @@ int main( int argc, char* argv[] )
         vector<const StateMachine*> backCar;
         backCar.push_back(back);
         backCar.push_back(trbp);
-        backCar.push_back(iccf);
+        backCar.push_back(iccb);
         backCar.push_back(lock0);
         backCar.push_back(lock1);
         backCar.push_back(lock2);
@@ -192,60 +192,82 @@ int main( int argc, char* argv[] )
         stop2.addAllow(new StateSnapshot(2), 11) ;     // driver
         pvObj.addSTOP(&stop2);
         
-        StoppingState end1(startPoint);
-        end1.addAllow(new StateSnapshot(7), 1) ;      // merge
-        //end1.addAllow(new StateSnapshot(4), 2) ;      // front
-        //end1.addAllow(new StateSnapshot(4), 3) ;      // back
-        end1.addAllow(new StateSnapshot(4), 7) ;      // trbp
-        end1.addProhibit(new StateSnapshot(1), 8) ;      // icc merge
-        end1.addProhibit(new StateSnapshot(1), 9) ;      // icc front
-        end1.addProhibit(new StateSnapshot(1), 10) ;     // icc back
-        end1.addAllow(new StateSnapshot(4), 11) ;     // driver
-        pvObj.addEND(&end1);
+        StoppingState stopclockfail1(startPoint);
+        stopclockfail1.addAllow(new StateSnapshot(7), 1) ;      // merge
+        //stopclockfail1.addAllow(new StateSnapshot(4), 2) ;      // front
+        //stopclockfail1.addAllow(new StateSnapshot(4), 3) ;      // back
+        stopclockfail1.addAllow(new StateSnapshot(4), 7) ;      // trbp
+        stopclockfail1.addProhibit(new StateSnapshot(1), 8) ;      // icc merge
+        stopclockfail1.addProhibit(new StateSnapshot(1), 9) ;      // icc front
+        stopclockfail1.addProhibit(new StateSnapshot(1), 10) ;     // icc back
+        stopclockfail1.addAllow(new StateSnapshot(4), 11) ;     // driver
+        pvObj.addSTOP(&stopclockfail1);
 
-        StoppingState end1a(startPoint);
-        end1a.addAllow(new StateSnapshot(10), 1) ;      // merge
-        //end1a.addAllow(new StateSnapshot(4), 2) ;      // front
-        //end1a.addAllow(new StateSnapshot(4), 3) ;      // back
-        end1a.addAllow(new StateSnapshot(4), 7) ;      // trbp
-        end1a.addProhibit(new StateSnapshot(1), 8) ;      // icc merge
-        end1a.addProhibit(new StateSnapshot(1), 9) ;      // icc front
-        end1a.addProhibit(new StateSnapshot(1), 10) ;     // icc back
-        end1a.addAllow(new StateSnapshot(4), 11) ;     // driver
-        pvObj.addEND(&end1a);
+        StoppingState stopclockfail1a(startPoint);
+        stopclockfail1a.addAllow(new StateSnapshot(10), 1) ;      // merge
+        //stopclockfail1a.addAllow(new StateSnapshot(4), 2) ;      // front
+        //stopclockfail1a.addAllow(new StateSnapshot(4), 3) ;      // back
+        stopclockfail1a.addAllow(new StateSnapshot(4), 7) ;      // trbp
+        stopclockfail1a.addProhibit(new StateSnapshot(1), 8) ;      // icc merge
+        stopclockfail1a.addProhibit(new StateSnapshot(1), 9) ;      // icc front
+        stopclockfail1a.addProhibit(new StateSnapshot(1), 10) ;     // icc back
+        stopclockfail1a.addAllow(new StateSnapshot(4), 11) ;     // driver
+        pvObj.addSTOP(&stopclockfail1a);
         
-        StoppingState end2(startPoint);
-        //end2.addAllow(new StateSnapshot(7), 1) ;      // merge
-        end2.addAllow(new StateSnapshot(5), 2) ;      // front
-        //end2.addAllow(new StateSnapshot(4), 3) ;      // back
-        end2.addAllow(new StateSnapshot(4), 7) ;      // trbp
-        end2.addProhibit(new StateSnapshot(1), 8) ;      // icc merge
-        end2.addProhibit(new StateSnapshot(1), 9) ;      // icc front
-        end2.addProhibit(new StateSnapshot(1), 10) ;     // icc back
-        end2.addAllow(new StateSnapshot(4), 11) ;     // driver
-        pvObj.addEND(&end2);
+        StoppingState stopclockfail2(startPoint);
+        //stopclockfail2.addAllow(new StateSnapshot(7), 1) ;      // merge
+        stopclockfail2.addAllow(new StateSnapshot(5), 2) ;      // front
+        //stopclockfail2.addAllow(new StateSnapshot(4), 3) ;      // back
+        stopclockfail2.addAllow(new StateSnapshot(4), 7) ;      // trbp
+        stopclockfail2.addProhibit(new StateSnapshot(1), 8) ;      // icc merge
+        stopclockfail2.addProhibit(new StateSnapshot(1), 9) ;      // icc front
+        stopclockfail2.addProhibit(new StateSnapshot(1), 10) ;     // icc back
+        stopclockfail2.addAllow(new StateSnapshot(4), 11) ;     // driver
+        pvObj.addSTOP(&stopclockfail2);
 
-        StoppingState end3(startPoint);
-        //end3.addAllow(new StateSnapshot(7), 1) ;      // merge
-        //end3.addAllow(new StateSnapshot(4), 2) ;      // front
-        end3.addAllow(new StateSnapshot(5), 3) ;      // back
-        end3.addAllow(new StateSnapshot(4), 7) ;      // trbp
-        end3.addProhibit(new StateSnapshot(1), 8) ;      // icc merge
-        end3.addProhibit(new StateSnapshot(1), 9) ;      // icc front
-        end3.addProhibit(new StateSnapshot(1), 10) ;     // icc back
-        end3.addAllow(new StateSnapshot(4), 11) ;     // driver
-        pvObj.addEND(&end3);
+        StoppingState stopclockfail3(startPoint);
+        //stopclockfail3.addAllow(new StateSnapshot(7), 1) ;      // merge
+        //stopclockfail3.addAllow(new StateSnapshot(4), 2) ;      // front
+        stopclockfail3.addAllow(new StateSnapshot(5), 3) ;      // back
+        stopclockfail3.addAllow(new StateSnapshot(4), 7) ;      // trbp
+        stopclockfail3.addProhibit(new StateSnapshot(1), 8) ;      // icc merge
+        stopclockfail3.addProhibit(new StateSnapshot(1), 9) ;      // icc front
+        stopclockfail3.addProhibit(new StateSnapshot(1), 10) ;     // icc back
+        stopclockfail3.addAllow(new StateSnapshot(4), 11) ;     // driver
+        pvObj.addSTOP(&stopclockfail3);
         
-        StoppingState end4(startPoint);
-        end4.addAllow(new StateSnapshot(0), 1) ;      // merge
-        end4.addAllow(new StateSnapshot(0), 2) ;      // front
-        end4.addAllow(new StateSnapshot(0), 3) ;      // back
-        end4.addAllow(new StateSnapshot(4), 7) ;      // trbp
-        end4.addProhibit(new StateSnapshot(1), 8) ;      // icc merge
-        end4.addProhibit(new StateSnapshot(1), 9) ;      // icc front
-        end4.addProhibit(new StateSnapshot(1), 10) ;     // icc back
-        end4.addAllow(new StateSnapshot(4), 11) ;     // driver
-        pvObj.addEND(&end4);
+        StoppingState stopclockfail4(startPoint);
+        stopclockfail4.addAllow(new StateSnapshot(0), 1) ;      // merge
+        stopclockfail4.addAllow(new StateSnapshot(0), 2) ;      // front
+        stopclockfail4.addAllow(new StateSnapshot(0), 3) ;      // back
+        stopclockfail4.addAllow(new StateSnapshot(4), 7) ;      // trbp
+        stopclockfail4.addProhibit(new StateSnapshot(1), 8) ;      // icc merge
+        stopclockfail4.addProhibit(new StateSnapshot(1), 9) ;      // icc front
+        stopclockfail4.addProhibit(new StateSnapshot(1), 10) ;     // icc back
+        stopclockfail4.addAllow(new StateSnapshot(4), 11) ;     // driver
+        pvObj.addSTOP(&stopclockfail4);
+
+        StoppingState end3clock(startPoint);
+        end3clock.addAllow(new StateSnapshot(10), 1) ;      // merge
+        end3clock.addAllow(new StateSnapshot(5), 2) ;      // front
+        end3clock.addAllow(new StateSnapshot(5), 3) ;      // back
+        end3clock.addAllow(new StateSnapshot(4), 7) ;      // trbp
+        end3clock.addProhibit(new StateSnapshot(1), 8) ;      // icc merge
+        end3clock.addProhibit(new StateSnapshot(1), 9) ;      // icc front
+        end3clock.addProhibit(new StateSnapshot(1), 10) ;     // icc back
+        end3clock.addAllow(new StateSnapshot(4), 11) ;     // driver
+        pvObj.addEND(&end3clock);
+
+        StoppingState end3clocka(startPoint);
+        end3clocka.addAllow(new StateSnapshot(7), 1) ;      // merge
+        end3clocka.addAllow(new StateSnapshot(5), 2) ;      // front
+        end3clocka.addAllow(new StateSnapshot(5), 3) ;      // back
+        end3clocka.addAllow(new StateSnapshot(4), 7) ;      // trbp
+        end3clocka.addProhibit(new StateSnapshot(1), 8) ;      // icc merge
+        end3clocka.addProhibit(new StateSnapshot(1), 9) ;      // icc front
+        end3clocka.addProhibit(new StateSnapshot(1), 10) ;     // icc back
+        end3clocka.addAllow(new StateSnapshot(4), 11) ;     // driver
+        pvObj.addEND(&end3clocka);
 
         // Driver is notified GREENLIGHT, but the gap is not ready yet
         StoppingState err1a(startPoint);
@@ -346,6 +368,21 @@ int main( int argc, char* argv[] )
         err6c.addAllow(new StateSnapshot(2), 11);   // driver
         err6c.addAllow(new StateSnapshot(2), 10);   // icc back
         pvObj.addError(&err6c);
+
+        StoppingState err7a(startPoint);
+        err7a.addAllow(new StateSnapshot(10), 1) ;      // merge
+        err7a.addAllow(new StateSnapshot(2), 11);   // driver
+        pvObj.addError(&err7a);
+        
+        StoppingState err7b(startPoint);
+        err7b.addAllow(new StateSnapshot(5), 2) ;      // front
+        err7b.addAllow(new StateSnapshot(2), 11);   // driver
+        pvObj.addError(&err7b);
+        
+        StoppingState err7c(startPoint);
+        err7c.addAllow(new StateSnapshot(5), 3) ;      // back
+        err7c.addAllow(new StateSnapshot(2), 11);   // driver
+        pvObj.addError(&err7c);
         
         pvObj.addPrintStop(printStop) ;
         
