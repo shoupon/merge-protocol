@@ -26,6 +26,7 @@ using namespace std;
 #include "trbp.h"
 #include "cruise.h"
 #include "driver.h"
+#include "sensor.h"
 
 #include "mergechecker.h"
 
@@ -111,6 +112,10 @@ int main( int argc, char* argv[] )
         Driver* driver = new Driver(psrPtr->getMsgTable(), psrPtr->getMacTable());
         pvObj.addMachine(driver);
         sync->addMachine(driver);
+
+        Sensor* sensor = new Sensor(psrPtr->getMsgTable(), psrPtr->getMacTable());
+        pvObj.addMachine(sensor);
+        sync->addMachine(sensor);
         
         // Initialize SecureChecker
         MergeChecker mergeChk;
@@ -185,18 +190,19 @@ int main( int argc, char* argv[] )
         stop2.addAllow(new StateSnapshot(3), 2) ;      // front
         stop2.addAllow(new StateSnapshot(3), 3) ;      // back
         stop2.addAllow(new LockSnapshot(5,2,MOVE), 6) ; // lock 2
-        stop2.addAllow(new StateSnapshot(2), 7) ;      // trbp
+        stop2.addAllow(new StateSnapshot(1), 7) ;      // trbp
         stop2.addAllow(new StateSnapshot(1), 8) ;      // icc merge
         stop2.addAllow(new StateSnapshot(1), 9) ;      // icc front
         stop2.addAllow(new StateSnapshot(1), 10) ;     // icc back
         stop2.addAllow(new StateSnapshot(2), 11) ;     // driver
+        stop2.addAllow(new StateSnapshot(2), 12) ;     // sensor
         pvObj.addSTOP(&stop2);
         
         StoppingState stopclockfail1(startPoint);
         stopclockfail1.addAllow(new StateSnapshot(7), 1) ;      // merge
         //stopclockfail1.addAllow(new StateSnapshot(4), 2) ;      // front
         //stopclockfail1.addAllow(new StateSnapshot(4), 3) ;      // back
-        stopclockfail1.addAllow(new StateSnapshot(4), 7) ;      // trbp
+        stopclockfail1.addAllow(new StateSnapshot(2), 7) ;      // trbp
         stopclockfail1.addProhibit(new StateSnapshot(1), 8) ;      // icc merge
         stopclockfail1.addProhibit(new StateSnapshot(1), 9) ;      // icc front
         stopclockfail1.addProhibit(new StateSnapshot(1), 10) ;     // icc back
@@ -207,7 +213,7 @@ int main( int argc, char* argv[] )
         stopclockfail1a.addAllow(new StateSnapshot(10), 1) ;      // merge
         //stopclockfail1a.addAllow(new StateSnapshot(4), 2) ;      // front
         //stopclockfail1a.addAllow(new StateSnapshot(4), 3) ;      // back
-        stopclockfail1a.addAllow(new StateSnapshot(4), 7) ;      // trbp
+        stopclockfail1a.addAllow(new StateSnapshot(2), 7) ;      // trbp
         stopclockfail1a.addProhibit(new StateSnapshot(1), 8) ;      // icc merge
         stopclockfail1a.addProhibit(new StateSnapshot(1), 9) ;      // icc front
         stopclockfail1a.addProhibit(new StateSnapshot(1), 10) ;     // icc back
@@ -218,7 +224,7 @@ int main( int argc, char* argv[] )
         //stopclockfail2.addAllow(new StateSnapshot(7), 1) ;      // merge
         stopclockfail2.addAllow(new StateSnapshot(5), 2) ;      // front
         //stopclockfail2.addAllow(new StateSnapshot(4), 3) ;      // back
-        stopclockfail2.addAllow(new StateSnapshot(4), 7) ;      // trbp
+        stopclockfail2.addAllow(new StateSnapshot(2), 7) ;      // trbp
         stopclockfail2.addProhibit(new StateSnapshot(1), 8) ;      // icc merge
         stopclockfail2.addProhibit(new StateSnapshot(1), 9) ;      // icc front
         stopclockfail2.addProhibit(new StateSnapshot(1), 10) ;     // icc back
@@ -229,7 +235,7 @@ int main( int argc, char* argv[] )
         //stopclockfail3.addAllow(new StateSnapshot(7), 1) ;      // merge
         //stopclockfail3.addAllow(new StateSnapshot(4), 2) ;      // front
         stopclockfail3.addAllow(new StateSnapshot(5), 3) ;      // back
-        stopclockfail3.addAllow(new StateSnapshot(4), 7) ;      // trbp
+        stopclockfail3.addAllow(new StateSnapshot(2), 7) ;      // trbp
         stopclockfail3.addProhibit(new StateSnapshot(1), 8) ;      // icc merge
         stopclockfail3.addProhibit(new StateSnapshot(1), 9) ;      // icc front
         stopclockfail3.addProhibit(new StateSnapshot(1), 10) ;     // icc back
@@ -240,7 +246,7 @@ int main( int argc, char* argv[] )
         stopclockfail4.addAllow(new StateSnapshot(0), 1) ;      // merge
         stopclockfail4.addAllow(new StateSnapshot(0), 2) ;      // front
         stopclockfail4.addAllow(new StateSnapshot(0), 3) ;      // back
-        stopclockfail4.addAllow(new StateSnapshot(4), 7) ;      // trbp
+        stopclockfail4.addAllow(new StateSnapshot(2), 7) ;      // trbp
         stopclockfail4.addProhibit(new StateSnapshot(1), 8) ;      // icc merge
         stopclockfail4.addProhibit(new StateSnapshot(1), 9) ;      // icc front
         stopclockfail4.addProhibit(new StateSnapshot(1), 10) ;     // icc back
@@ -251,7 +257,7 @@ int main( int argc, char* argv[] )
         end3clock.addAllow(new StateSnapshot(10), 1) ;      // merge
         end3clock.addAllow(new StateSnapshot(5), 2) ;      // front
         end3clock.addAllow(new StateSnapshot(5), 3) ;      // back
-        end3clock.addAllow(new StateSnapshot(4), 7) ;      // trbp
+        end3clock.addAllow(new StateSnapshot(2), 7) ;      // trbp
         end3clock.addProhibit(new StateSnapshot(1), 8) ;      // icc merge
         end3clock.addProhibit(new StateSnapshot(1), 9) ;      // icc front
         end3clock.addProhibit(new StateSnapshot(1), 10) ;     // icc back
@@ -262,7 +268,7 @@ int main( int argc, char* argv[] )
         end3clocka.addAllow(new StateSnapshot(7), 1) ;      // merge
         end3clocka.addAllow(new StateSnapshot(5), 2) ;      // front
         end3clocka.addAllow(new StateSnapshot(5), 3) ;      // back
-        end3clocka.addAllow(new StateSnapshot(4), 7) ;      // trbp
+        end3clocka.addAllow(new StateSnapshot(2), 7) ;      // trbp
         end3clocka.addProhibit(new StateSnapshot(1), 8) ;      // icc merge
         end3clocka.addProhibit(new StateSnapshot(1), 9) ;      // icc front
         end3clocka.addProhibit(new StateSnapshot(1), 10) ;     // icc back

@@ -22,6 +22,7 @@
 #define BACK_NAME "back"
 #define MERGE_NAME "merge"
 #define DRIVER_NAME "driver"
+#define SENSOR_NAME "sensor"
 #define SYNC_NAME "sync"
 
 // List of message names
@@ -37,13 +38,19 @@
 #define MAKEGAP "MAKE-GAP"
 #define ALIGN "ALIGN"
 // TRBP
+#define COMMLOSS "COMM-LOSS"
+#define TRBPON "TRBPon"
+#define TRBPOFF "TRBPoff"
+#define TRBPFAIL "TRBPfail"
+#define REQUIRE "REQUIRE"
+// Sensor
 #define EMERGENCY "EMERGENCY"
 #define GAPTAKEN "GAP-TAKEN"
-#define COMMLOSS "COMM-LOSS"
 #define GAPREADY "GAP-READY"
-#define START "START"
-#define MONITOR "MONITOR"
-#define STOP "STOP"
+#define INCONSISTENT "INCONSISTENT-READINGS"
+#define SENSORON "SENSORon"
+#define SENSOROFF "SENSORoff"
+#define SENSORFAIL "SENSORfail"
 // Driver
 #define SIGNAL "SIGNAL"
 #define CANCEL "CANCEL"
