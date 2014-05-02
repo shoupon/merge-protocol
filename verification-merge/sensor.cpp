@@ -34,6 +34,8 @@ int Sensor::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &
             }
             else if( msg == DEADLINE )
                 return 3;
+            else if (msg == TRBPFAIL)
+                return 3;
             else
                 return -1;
             break;

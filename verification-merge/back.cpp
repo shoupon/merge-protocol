@@ -31,7 +31,7 @@ int Back::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &hi
         case 0:
             if( msg == COOPERATE ) {
                 if(src != LOCK_0_NAME) 
-                    return 3;
+                    return -1;
                 _state = 1;
                 return 3;
             }
@@ -113,7 +113,8 @@ int Back::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &hi
                 int did = inMsg->getParam(1);
                 if( did == 0 || did == 1)
                     return 3;
-                assert(did == 2);
+                else if( did > 2 )
+                    assert(false) ;
                 outMsgs.push_back(new MessageTuple(inMsg->srcID(),
                                                    machineToInt(CRUISE_BACK_NAME),
                                                    inMsg->srcMsgId(),
@@ -187,7 +188,17 @@ bool Back::isEmergency(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs) {
     string msg = IntToMessage(inMsg->destMsgId()) ;
     string src = IntToMachine(inMsg->subjectId()) ;
     if( msg == EMERGENCY ) {
-        assert(src == TRBP_NAME) ;
+        assert(src == SENSOR_NAME) ;
+        outMsgs.push_back(new MessageTuple(inMsg->srcID(),
+                                           machineToInt(CRUISE_BACK_NAME),
+                                           inMsg->srcMsgId(),
+                                           messageToInt(PILOT),
+                                           macId()));
+        _state = 4;
+        return true;
+    }
+    else if (msg == COMMLOSS) {
+        assert(src == TRBP_NAME);
         outMsgs.push_back(new MessageTuple(inMsg->srcID(),
                                            machineToInt(CRUISE_BACK_NAME),
                                            inMsg->srcMsgId(),

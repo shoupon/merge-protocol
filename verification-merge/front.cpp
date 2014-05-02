@@ -30,7 +30,7 @@ int Front::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &h
         case 0:
             if( msg == COOPERATE ) {
                 if(src != LOCK_0_NAME) 
-                    return 3;
+                    return -1;
                 _state = 1;
                 return 3;
             }
@@ -119,7 +119,7 @@ int Front::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &h
                                                    inMsg->srcMsgId(),
                                                    messageToInt(RESET),
                                                    macId()));
-                _state = 4 ;
+                _state = 0 ;
                 return 3;
             }
             else if( isEmergency(inMsg, outMsgs) )
@@ -188,7 +188,17 @@ bool Front::isEmergency(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs) {
     string msg = IntToMessage(inMsg->destMsgId()) ;
     string src = IntToMachine(inMsg->subjectId()) ;
     if( msg == EMERGENCY ) {
-        assert(src == TRBP_NAME) ;
+        assert(src == SENSOR_NAME) ;
+        outMsgs.push_back(new MessageTuple(inMsg->srcID(),
+                                           machineToInt(CRUISE_FRONT_NAME),
+                                           inMsg->srcMsgId(),
+                                           messageToInt(PILOT),
+                                           macId()));
+        _state = 4;
+        return true;
+    }
+    else if (msg == COMMLOSS) {
+        assert(src == TRBP_NAME);
         outMsgs.push_back(new MessageTuple(inMsg->srcID(),
                                            machineToInt(CRUISE_FRONT_NAME),
                                            inMsg->srcMsgId(),

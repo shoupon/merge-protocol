@@ -54,9 +54,11 @@ int TRBP::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &hi
                 outMsgs.push_back(loss(FRONT_NAME));
                 outMsgs.push_back(loss(BACK_NAME));
                 outMsgs.push_back(createMsg(inMsg, SENSOR_NAME, TRBPFAIL));
-                _state = 4;
+                _state = 2;
                 return 3;
             }
+            else if (msg == REQUIRE)
+                return 3;
             else
                 return -1;
             break;

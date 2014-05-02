@@ -153,7 +153,7 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs, bool &hi
                 assert(src == LOCK_2_NAME) ;
                 outMsgs.push_back(createOutput(inMsg, machineToInt(DRIVER_NAME),
                                                messageToInt(GREENLIGHT))) ;
-                _state = 4;
+                _state = 5;
                 return 3;
             }
             else if( msg == DEADLINE ) {
@@ -174,7 +174,10 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs, bool &hi
             }
             else if( msg == CANCEL ) {
                 assert(src == DRIVER_NAME);
-                cancelSeq(inMsg, outMsgs);
+                outMsgs.push_back(createOutput(inMsg, machineToInt(CRUISE_MERGE_NAME),
+                                               messageToInt(RESET)));
+                outMsgs.push_back(createOutput(inMsg, machineToInt(SENSOR_NAME),
+                                               messageToInt(SENSOROFF)));
                 _state = 6 ;
                 return 3;
             }
@@ -198,8 +201,16 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs, bool &hi
             else if( msg == DEADLINE ) {
                 int did = inMsg->getParam(1) ;
                 if(did == 2) {
-                    abortSeq(inMsg, outMsgs);
-                    return 0;
+                    outMsgs.push_back(createOutput(inMsg, machineToInt(TRBP_NAME),
+                                                   messageToInt(TRBPOFF)));
+                    outMsgs.push_back(createOutput(inMsg, machineToInt(DRIVER_NAME),
+                                                   messageToInt(ABORT)));
+                    outMsgs.push_back(createOutput(inMsg, machineToInt(CRUISE_MERGE_NAME),
+                                                   messageToInt(RESET)));
+                    outMsgs.push_back(createOutput(inMsg, machineToInt(SENSOR_NAME),
+                                                   messageToInt(SENSOROFF)));
+                    _state = 0;
+                    return 3;
                 }
                 else
                     return 3;
@@ -222,6 +233,11 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs, bool &hi
                 else
                     return 3;
             }
+            else if (msg == COMMLOSS) {
+                assert(src == TRBP_NAME);
+                _state = 0;
+                return 3;
+            }
             else if (msg == CLOCKFAIL)
                 return 3;
             else
@@ -238,7 +254,7 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs, bool &hi
             else if( msg == DEADLINE ) 
                 return 3;
             else if (msg == SUCCESS) {
-                assert(src == LOCK_1_NAME);
+                assert(src == LOCK_1_NAME || src == LOCK_2_NAME);
                 return 3;
             }
             else if (msg == CLOCKFAIL)
@@ -328,13 +344,22 @@ bool Merge::isEmergency(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs) {
     string msg = IntToMessage(inMsg->destMsgId()) ;
     string src = IntToMachine(inMsg->subjectId()) ;
     if( msg == EMERGENCY ) {
-        assert(src == TRBP_NAME) ;
+        assert(src == SENSOR_NAME) ;
         outMsgs.push_back(createOutput(inMsg, machineToInt(CRUISE_MERGE_NAME),
                                        messageToInt(PILOT)));
         outMsgs.push_back(createOutput(inMsg, machineToInt(DRIVER_NAME),
                                        messageToInt(ABORT)));
-        outMsgs.push_back(createOutput(inMsg, machineToInt(SENSOR_NAME),
-                                       messageToInt(SENSOROFF)));
+        outMsgs.push_back(createOutput(inMsg, machineToInt(TRBP_NAME),
+                                       messageToInt(TRBPOFF)));
+        _state = 7;
+        return true;
+    }
+    else if (msg == COMMLOSS) {
+        assert(src == TRBP_NAME);
+        outMsgs.push_back(createOutput(inMsg, machineToInt(CRUISE_MERGE_NAME),
+                                       messageToInt(PILOT)));
+        outMsgs.push_back(createOutput(inMsg, machineToInt(DRIVER_NAME),
+                                       messageToInt(ABORT)));
         _state = 7;
         return true;
     }

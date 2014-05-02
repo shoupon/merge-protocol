@@ -281,10 +281,6 @@ int main( int argc, char* argv[] )
         err1a.addAllow(new StateSnapshot(0), 7);      // trbp
         pvObj.addError(&err1a);
         
-        StoppingState err1b(startPoint);
-        err1b.addAllow(new StateSnapshot(2), 11);     // driver
-        err1b.addAllow(new StateSnapshot(1), 7);      // trbp
-        pvObj.addError(&err1b);
         
         // Cruise control is being engaged when trbp is not started
         StoppingState err2a(startPoint);
@@ -302,16 +298,17 @@ int main( int argc, char* argv[] )
         err2c.addAllow(new StateSnapshot(1), 10);   // icc back
         pvObj.addError(&err2c);
         
+        /*
         // Driver is not notified when emergency takes place
         StoppingState err3a(startPoint);
-        err3a.addAllow(new StateSnapshot(1), 7);    // trbp
+        err3a.addAllow(new StateSnapshot(0), 7);    // trbp
         err3a.addAllow(new StateSnapshot(1), 11);   // driver
         //pvObj.addError(&err3a);
         
         StoppingState err3b(startPoint);
-        err3b.addAllow(new StateSnapshot(1), 7);    // trbp
+        err3b.addAllow(new StateSnapshot(0), 12);    // sensor
         err3b.addAllow(new StateSnapshot(2), 11);   // driver
-        pvObj.addError(&err3b);
+        pvObj.addError(&err3b);*/
         
         // Driver is changing lanes but either the periodic update or the lock protocol
         // is not operating
