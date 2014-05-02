@@ -26,6 +26,7 @@
 #define SYNC_NAME "sync"
 
 // List of message names
+#define REQUIRE "REQUIRE"
 // Lock
 #define ATTEMPT "ATTEMPT"
 #define SUCCESS "SUCCESS"
@@ -42,7 +43,6 @@
 #define TRBPON "TRBPon"
 #define TRBPOFF "TRBPoff"
 #define TRBPFAIL "TRBPfail"
-#define REQUIRE "REQUIRE"
 // Sensor
 #define EMERGENCY "EMERGENCY"
 #define GAPTAKEN "GAP-TAKEN"
@@ -57,9 +57,6 @@
 #define ABORT "ABORT"
 #define FINISH "FINISH"
 #define GREENLIGHT "GREENLIGHT"
-#define DISABLE "DISABLE"
-#define FAILURE "FAILURE"
-#define NOTIFY "NOTIFY"
 // Merge
 #define REQUEST "REQUEST"
 #define CREATE "CREATE"

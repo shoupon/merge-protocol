@@ -140,6 +140,11 @@ int Front::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &h
                 else
                     return -1;
             }
+            else if (msg == DISENGAGE) {
+                assert(src == CRUISE_FRONT_NAME);
+                _state = 0;
+                return 3;
+            }
             else if (msg == CLOCKFAIL){
                 _state = 5;
                 return 3;
@@ -152,6 +157,10 @@ int Front::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &h
                 _state = 5;
                 return 3;
             }
+            else if (msg == DISENGAGE) {
+                assert(src == CRUISE_FRONT_NAME);
+                return 3;
+            }
             else
                 return -1;
             break;
@@ -160,28 +169,6 @@ int Front::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &h
             break;
     }
     return -1;
-}
-
-
-int Front::nullInputTrans(vector<MessageTuple *> &outMsgs, bool &high_prob, int startIdx)
-{
-    outMsgs.clear();
-    high_prob = true ;
-    if( startIdx != 0 )
-        return -1;
-    
-    switch (_state) {
-        case 4:
-            outMsgs.push_back(new MessageTuple(0, machineToInt(CRUISE_FRONT_NAME),
-                                               0, messageToInt(DISENGAGE),
-                                               macId()));
-            _state = 0;
-            return 3;
-            break;
-        default:
-            return -1;
-            break;
-    }
 }
 
 bool Front::isEmergency(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs) {

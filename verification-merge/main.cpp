@@ -130,28 +130,17 @@ int main( int argc, char* argv[] )
         mergeCar.push_back(merge);
         mergeCar.push_back(trbp);
         mergeCar.push_back(iccm);
-        mergeCar.push_back(lock0);
-        mergeCar.push_back(lock1);
-        mergeCar.push_back(lock2);
         mergeCar.push_back(driver);
         sync->addFailureGroup(mergeCar);
         vector<const StateMachine*> frontCar;
         frontCar.push_back(front);
         frontCar.push_back(trbp);
         frontCar.push_back(iccf);
-        frontCar.push_back(lock0);
-        frontCar.push_back(lock1);
-        frontCar.push_back(lock2);
-        frontCar.push_back(driver);
         sync->addFailureGroup(frontCar);
         vector<const StateMachine*> backCar;
         backCar.push_back(back);
         backCar.push_back(trbp);
         backCar.push_back(iccb);
-        backCar.push_back(lock0);
-        backCar.push_back(lock1);
-        backCar.push_back(lock2);
-        backCar.push_back(driver);
         sync->addFailureGroup(backCar);
 
         // Add a default service (stub)
@@ -228,7 +217,6 @@ int main( int argc, char* argv[] )
         stopclockfail2.addProhibit(new StateSnapshot(1), 8) ;      // icc merge
         stopclockfail2.addProhibit(new StateSnapshot(1), 9) ;      // icc front
         stopclockfail2.addProhibit(new StateSnapshot(1), 10) ;     // icc back
-        stopclockfail2.addAllow(new StateSnapshot(4), 11) ;     // driver
         pvObj.addSTOP(&stopclockfail2);
 
         StoppingState stopclockfail3(startPoint);
@@ -238,8 +226,7 @@ int main( int argc, char* argv[] )
         stopclockfail3.addAllow(new StateSnapshot(2), 7) ;      // trbp
         stopclockfail3.addProhibit(new StateSnapshot(1), 8) ;      // icc merge
         stopclockfail3.addProhibit(new StateSnapshot(1), 9) ;      // icc front
-        stopclockfail3.addProhibit(new StateSnapshot(1), 10) ;     // icc back
-        stopclockfail3.addAllow(new StateSnapshot(4), 11) ;     // driver
+        stopclockfail3.addProhibit(new StateSnapshot(1), 10) ;     // icc back        
         pvObj.addSTOP(&stopclockfail3);
         
         StoppingState stopclockfail4(startPoint);
@@ -250,7 +237,6 @@ int main( int argc, char* argv[] )
         stopclockfail4.addProhibit(new StateSnapshot(1), 8) ;      // icc merge
         stopclockfail4.addProhibit(new StateSnapshot(1), 9) ;      // icc front
         stopclockfail4.addProhibit(new StateSnapshot(1), 10) ;     // icc back
-        stopclockfail4.addAllow(new StateSnapshot(4), 11) ;     // driver
         pvObj.addSTOP(&stopclockfail4);
 
         StoppingState end3clock(startPoint);

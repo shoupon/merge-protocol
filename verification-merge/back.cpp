@@ -140,6 +140,11 @@ int Back::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &hi
                 else
                     return -1;
             }
+            else if (msg == DISENGAGE) {
+                assert(src == CRUISE_BACK_NAME);
+                _state = 0;
+                return 3;
+            }
             else if (msg == CLOCKFAIL){
                 _state = 5;
                 return 3;
@@ -152,6 +157,10 @@ int Back::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &hi
                 _state = 5;
                 return 3;
             }
+            else if (msg == DISENGAGE) {
+                assert(src == CRUISE_BACK_NAME);
+                return 3;
+            }
             else
                 return -1;
             break;
@@ -161,28 +170,6 @@ int Back::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &hi
     }
     return -1;
 }
-
-int Back::nullInputTrans(vector<MessageTuple *> &outMsgs, bool &high_prob, int startIdx)
-{
-    outMsgs.clear();
-    high_prob = true ;
-    if( startIdx != 0 )
-        return -1;
-    
-    switch (_state) {
-        case 4:
-            outMsgs.push_back(new MessageTuple(0, machineToInt(CRUISE_BACK_NAME),
-                                               0, messageToInt(DISENGAGE),
-                                               macId()));
-            _state = 0;
-            return 3;
-            break;
-        default:
-            return -1;
-            break;
-    }
-}
-
 
 bool Back::isEmergency(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs) {
     string msg = IntToMessage(inMsg->destMsgId()) ;

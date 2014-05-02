@@ -32,20 +32,12 @@ int Driver::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs,
     }
     switch (_state) {
         case 0:
-            if (msg == NOTIFY) {
-                assert(src == MERGE_NAME);
-                _state = 3;
+            if( msg == DEADLINE )
                 return 3;
-            }
             else
-                return 3;
+                return -1;
         case 1:
             if( msg == ABORT ) {
-                assert(src == MERGE_NAME);
-                _state = 3 ;
-                return 3;
-            }
-            else if( msg == FAILURE ) {
                 assert(src == MERGE_NAME);
                 _state = 0 ;
                 return 3;
@@ -63,15 +55,10 @@ int Driver::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs,
         case 2:
             if( msg == ABORT ) {
                 assert(src == MERGE_NAME);
-                _state = 3 ;
+                _state = 0 ;
                 return 3;
             }
             else if( msg == DEADLINE )
-                return 3;
-            else
-                return 3;
-        case 3:
-            if( msg == DEADLINE )
                 return 3;
             else
                 return 3;
@@ -97,6 +84,8 @@ int Driver::nullInputTrans(vector<MessageTuple *> &outMsgs, bool &high_prob, int
         case 0:
             outMsgs.push_back(new MessageTuple(0, machineToInt(MERGE_NAME),
                                                0, messageToInt(SIGNAL), macId()));
+            outMsgs.push_back(new MessageTuple(0, machineToInt(CRUISE_MERGE_NAME),
+                                               0, messageToInt(REQUIRE), macId()));
             _state = 1;
             return 3;
             break;
@@ -113,11 +102,6 @@ int Driver::nullInputTrans(vector<MessageTuple *> &outMsgs, bool &high_prob, int
             _state = 0 ;
             return 3;
             break;
-        case 3:
-            outMsgs.push_back(new MessageTuple(0, machineToInt(MERGE_NAME),
-                                               0, messageToInt(DISABLE), macId()));
-            _state = 0;
-            return 3;
         default:
             return -1;
             break;
