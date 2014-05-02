@@ -66,8 +66,16 @@ int Front::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &h
                 _state = 2;
                 return 3;
             }
-            else if( isEmergency(inMsg, outMsgs) )
+            else if( msg == EMERGENCY ) {
+                assert(src == SENSOR_NAME) ;
+                _state = 0;
                 return 3;
+            }
+            else if (msg == COMMLOSS) {
+                assert(src == TRBP_NAME);
+                _state = 0;
+                return 3;
+            }
             else if (msg == CLOCKFAIL) {
                 _state = 5;
                 return 3;
@@ -101,6 +109,11 @@ int Front::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &h
             else if( isEmergency(inMsg, outMsgs) )
                 return 3;
             else if (msg == CLOCKFAIL){
+                outMsgs.push_back(new MessageTuple(inMsg->srcID(),
+                                                   machineToInt(CRUISE_FRONT_NAME),
+                                                   inMsg->srcMsgId(),
+                                                   messageToInt(RESET),
+                                                   macId()));
                 _state = 5;
                 return 3;
             }
@@ -125,27 +138,11 @@ int Front::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &h
             else if( isEmergency(inMsg, outMsgs) )
                 return 3;
             else if (msg == CLOCKFAIL){
-                _state = 5;
-                return 3;
-            }
-            else
-                return -1;
-            break;
-        case 4:
-            if (msg == DEADLINE)
-                return 3;
-            else if (msg == COOPERATE) {
-                if (src == LOCK_1_NAME)
-                    return 3;
-                else
-                    return -1;
-            }
-            else if (msg == DISENGAGE) {
-                assert(src == CRUISE_FRONT_NAME);
-                _state = 0;
-                return 3;
-            }
-            else if (msg == CLOCKFAIL){
+                outMsgs.push_back(new MessageTuple(inMsg->srcID(),
+                                                   machineToInt(CRUISE_FRONT_NAME),
+                                                   inMsg->srcMsgId(),
+                                                   messageToInt(RESET),
+                                                   macId()));
                 _state = 5;
                 return 3;
             }
@@ -153,12 +150,8 @@ int Front::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &h
                 return -1;
             break;
         case 5:
-            if( isEmergency(inMsg, outMsgs) ) {
-                _state = 5;
-                return 3;
-            }
-            else if (msg == DISENGAGE) {
-                assert(src == CRUISE_FRONT_NAME);
+            if (msg == COMMLOSS) {
+                assert(src == TRBP_NAME);
                 return 3;
             }
             else
@@ -179,9 +172,9 @@ bool Front::isEmergency(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs) {
         outMsgs.push_back(new MessageTuple(inMsg->srcID(),
                                            machineToInt(CRUISE_FRONT_NAME),
                                            inMsg->srcMsgId(),
-                                           messageToInt(PILOT),
+                                           messageToInt(RESET),
                                            macId()));
-        _state = 4;
+        _state = 0;
         return true;
     }
     else if (msg == COMMLOSS) {
@@ -189,9 +182,9 @@ bool Front::isEmergency(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs) {
         outMsgs.push_back(new MessageTuple(inMsg->srcID(),
                                            machineToInt(CRUISE_FRONT_NAME),
                                            inMsg->srcMsgId(),
-                                           messageToInt(PILOT),
+                                           messageToInt(RESET),
                                            macId()));
-        _state = 4;
+        _state = 0;
         return true;
     }
     else

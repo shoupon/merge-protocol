@@ -33,8 +33,6 @@
 #define COOPERATE "COOPERATE"
 // Cruise control
 #define RESET "RESET"
-#define PILOT "PILOT"
-#define DISENGAGE "DISENGAGE"
 #define MAINTAIN "MAINTAIN"
 #define MAKEGAP "MAKE-GAP"
 #define ALIGN "ALIGN"

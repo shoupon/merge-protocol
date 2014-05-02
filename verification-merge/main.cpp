@@ -261,6 +261,17 @@ int main( int argc, char* argv[] )
         end3clocka.addAllow(new StateSnapshot(4), 11) ;     // driver
         pvObj.addEND(&end3clocka);
 
+        StoppingState end3clockb(startPoint);
+        end3clockb.addAllow(new StateSnapshot(0), 1) ;      // merge
+        end3clockb.addAllow(new StateSnapshot(5), 2) ;      // front
+        end3clockb.addAllow(new StateSnapshot(5), 3) ;      // back
+        end3clockb.addAllow(new StateSnapshot(2), 7) ;      // trbp
+        end3clockb.addProhibit(new StateSnapshot(1), 8) ;      // icc merge
+        end3clockb.addProhibit(new StateSnapshot(1), 9) ;      // icc front
+        end3clockb.addProhibit(new StateSnapshot(1), 10) ;     // icc back
+        end3clockb.addAllow(new StateSnapshot(4), 11) ;     // driver
+        pvObj.addEND(&end3clockb);
+
         // Driver is notified GREENLIGHT, but the gap is not ready yet
         StoppingState err1a(startPoint);
         err1a.addAllow(new StateSnapshot(2), 11);     // driver

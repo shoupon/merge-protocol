@@ -38,11 +38,6 @@ int Cruise::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &
                 _state = 1;
                 return 3;
             }
-            else if( msg == PILOT ) {
-                assert(src == _name);
-                _state = 2;
-                return 3;
-            }
             else if( msg == DEADLINE )
                 return 3;
             else if (msg == REQUIRE) {
@@ -56,11 +51,6 @@ int Cruise::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &
             if( msg == RESET ) {
                 assert(src == _name) ;
                 _state = 0 ;
-                return 3;
-            }
-            else if( msg == PILOT ) {
-                assert(src == _name);
-                _state = 2;
                 return 3;
             }
             else if( msg == DEADLINE )
@@ -91,12 +81,6 @@ int Cruise::nullInputTrans(vector<MessageTuple *> &outMsgs, bool &high_prob, int
         case 0:
         case 1:
             return -1;
-            break;
-        case 2:
-            outMsgs.push_back(new MessageTuple(0, machineToInt(_name),
-                                               0, messageToInt(DISENGAGE), macId()));
-            _state = 0 ;
-            return 3;
             break;
         default:
             return -1;

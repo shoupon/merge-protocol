@@ -100,13 +100,25 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs, bool &hi
                 _state = 3;
                 return 3;
             }
-            else if( msg == CANCEL) {
+            else if (msg == CANCEL) {
                 assert(src == DRIVER_NAME) ;
                 _state = 8;
                 return 3;
             }
-            else if( isEmergency(inMsg, outMsgs) )
+            else if( msg == EMERGENCY ) {
+                assert(src == SENSOR_NAME) ;
+                outMsgs.push_back(createOutput(inMsg, machineToInt(DRIVER_NAME),
+                                               messageToInt(ABORT)));
+                _state = 8;
                 return 3;
+            }
+            else if (msg == COMMLOSS) {
+                assert(src == TRBP_NAME);
+                outMsgs.push_back(createOutput(inMsg, machineToInt(DRIVER_NAME),
+                                               messageToInt(ABORT)));
+                _state = 0;
+                return 3;
+            }
             else if (msg == CLOCKFAIL)
                 return 3;
             else
@@ -141,8 +153,24 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs, bool &hi
                 _state = 8 ;
                 return 3;
             }
-            else if( isEmergency(inMsg, outMsgs) )
+            else if( msg == EMERGENCY ) {
+                assert(src == SENSOR_NAME) ;
+                outMsgs.push_back(createOutput(inMsg, machineToInt(CRUISE_MERGE_NAME),
+                                               messageToInt(RESET)));
+                outMsgs.push_back(createOutput(inMsg, machineToInt(DRIVER_NAME),
+                                               messageToInt(ABORT)));
+                _state = 8;
                 return 3;
+            }
+            else if (msg == COMMLOSS) {
+                assert(src == TRBP_NAME);
+                outMsgs.push_back(createOutput(inMsg, machineToInt(CRUISE_MERGE_NAME),
+                                               messageToInt(RESET)));
+                outMsgs.push_back(createOutput(inMsg, machineToInt(DRIVER_NAME),
+                                               messageToInt(ABORT)));
+                _state = 0;
+                return 3;
+            }
             else if (msg == CLOCKFAIL)
                 return 3;
             else
@@ -163,10 +191,10 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs, bool &hi
                     outMsgs.push_back(createOutput(inMsg, machineToInt(DRIVER_NAME),
                                                    messageToInt(ABORT)));   
                     outMsgs.push_back(createOutput(inMsg, machineToInt(CRUISE_MERGE_NAME),
-                                                   messageToInt(PILOT)));
+                                                   messageToInt(RESET)));
                     outMsgs.push_back(createOutput(inMsg, machineToInt(SENSOR_NAME),
                                                    messageToInt(SENSOROFF)));
-                    _state = 6;
+                    _state = 7;
                     return 3;
                 }
                 else
@@ -178,11 +206,27 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs, bool &hi
                                                messageToInt(RESET)));
                 outMsgs.push_back(createOutput(inMsg, machineToInt(SENSOR_NAME),
                                                messageToInt(SENSOROFF)));
-                _state = 6 ;
+                _state = 7;
                 return 3;
             }
-            else if(isEmergency(inMsg, outMsgs))
+            else if( msg == EMERGENCY ) {
+                assert(src == SENSOR_NAME) ;
+                outMsgs.push_back(createOutput(inMsg, machineToInt(CRUISE_MERGE_NAME),
+                                               messageToInt(RESET)));
+                outMsgs.push_back(createOutput(inMsg, machineToInt(DRIVER_NAME),
+                                               messageToInt(ABORT)));
+                _state = 7;
                 return 3;
+            }
+            else if (msg == COMMLOSS) {
+                assert(src == TRBP_NAME);
+                outMsgs.push_back(createOutput(inMsg, machineToInt(CRUISE_MERGE_NAME),
+                                               messageToInt(RESET)));
+                outMsgs.push_back(createOutput(inMsg, machineToInt(DRIVER_NAME),
+                                               messageToInt(ABORT)));
+                _state = 0;
+                return 3;
+            }
             else if (msg == CLOCKFAIL)
                 return 3;
             else
@@ -215,8 +259,24 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs, bool &hi
                 else
                     return 3;
             }
-            else if( isEmergency(inMsg, outMsgs) )
+            else if( msg == EMERGENCY ) {
+                assert(src == SENSOR_NAME) ;
+                outMsgs.push_back(createOutput(inMsg, machineToInt(CRUISE_MERGE_NAME),
+                                               messageToInt(RESET)));
+                outMsgs.push_back(createOutput(inMsg, machineToInt(DRIVER_NAME),
+                                               messageToInt(ABORT)));
+                _state = 7;
                 return 3;
+            }
+            else if (msg == COMMLOSS) {
+                assert(src == TRBP_NAME);
+                outMsgs.push_back(createOutput(inMsg, machineToInt(CRUISE_MERGE_NAME),
+                                               messageToInt(RESET)));
+                outMsgs.push_back(createOutput(inMsg, machineToInt(DRIVER_NAME),
+                                               messageToInt(ABORT)));
+                _state = 0;
+                return 3;
+            }
             else if (msg == CLOCKFAIL)
                 return 3;
             else
@@ -228,10 +288,15 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs, bool &hi
                 if(did == 2) {
                     outMsgs.push_back(createOutput(inMsg, machineToInt(TRBP_NAME),
                                                    messageToInt(TRBPOFF)));
-                    return 0;
+                    _state = 0;
+                    return 3;
                 }
                 else
                     return 3;
+            }
+            else if (msg == SUCCESS) {
+                assert(src == LOCK_2_NAME);
+                return 3;
             }
             else if (msg == COMMLOSS) {
                 assert(src == TRBP_NAME);
@@ -240,17 +305,29 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs, bool &hi
             }
             else if (msg == CLOCKFAIL)
                 return 3;
+            else if (msg == EMERGENCY || msg == GAPTAKEN || msg == INCONSISTENT) {
+                assert(src == SENSOR_NAME);
+                return 3;
+            }
             else
                 return -1;
             break ;
         case 7:
-            if( msg == DISENGAGE ) {
-                assert( src == CRUISE_MERGE_NAME ) ;
+            if (msg == DEADLINE) {
+                int did = inMsg->getParam(1) ;
+                if(did == 2) {
+                    outMsgs.push_back(createOutput(inMsg, machineToInt(TRBP_NAME),
+                                                   messageToInt(TRBPOFF)));
+                    _state = 0;
+                    return 3;
+                }
+                return 3;
+            }
+            else if (msg == COMMLOSS) {
+                assert(src == TRBP_NAME);
                 _state = 0;
                 return 3;
             }
-            else if (msg == DEADLINE)
-                return 3;
             else if (msg == SUCCESS) {
                 assert(src == LOCK_1_NAME || src == LOCK_2_NAME);
                 return 3;
@@ -276,11 +353,13 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs, bool &hi
                 assert(src == LOCK_1_NAME) ;
                 return 3;
             }
-            else if( isEmergency(inMsg, outMsgs) ) {
+            else if (msg == EMERGENCY) {
+                assert(src == SENSOR_NAME);
                 return 3;
             }
-            else if (msg == SIGNAL) {
-                _state = 9;
+            else if (msg == COMMLOSS) {
+                assert(src == TRBP_NAME);
+                _state = 0;
                 return 3;
             }
             else if (msg == CLOCKFAIL)
@@ -288,45 +367,16 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs, bool &hi
             else
                 return -1;
             break ;
-        case 9:
-            if (msg == DEADLINE) {
-                int did = inMsg->getParam(1);
-                assert(did < 2);
-                if (did == 1) {
-                    outMsgs.push_back(createOutput(inMsg, machineToInt(TRBP_NAME),
-                                                   messageToInt(TRBPOFF)));
-                    outMsgs.push_back(createOutput(inMsg, machineToInt(DRIVER_NAME),
-                                                   messageToInt(ABORT)));
-                    _state = 0;
-                    return 3;
-                }
-                else
-                    return 3;
-            }
-            else if (msg == CANCEL) {
-                assert(src == DRIVER_NAME);
-                _state = 8;
-                return 3;
-            }
-            else if( msg == SUCCESS ) {
-                assert(src == LOCK_1_NAME) ;
-                return 3;
-            }
-            else if( isEmergency(inMsg, outMsgs) )
-                return 3;
-            else if (msg == CLOCKFAIL)
-                return 3;
-            else 
-                return -1;
-            break;
         case 10:
             if( isEmergency(inMsg, outMsgs) ){
                 return 3;
             }
-            if( msg == DISENGAGE ) {
-                assert( src == CRUISE_MERGE_NAME ) ;
+            else if (msg == SUCCESS) {
                 return 3;
             }
+            else
+                return -1;
+            break;
         default:
             return -1;
             break;
@@ -345,21 +395,19 @@ bool Merge::isEmergency(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs) {
     if( msg == EMERGENCY ) {
         assert(src == SENSOR_NAME) ;
         outMsgs.push_back(createOutput(inMsg, machineToInt(CRUISE_MERGE_NAME),
-                                       messageToInt(PILOT)));
+                                       messageToInt(RESET)));
         outMsgs.push_back(createOutput(inMsg, machineToInt(DRIVER_NAME),
                                        messageToInt(ABORT)));
         outMsgs.push_back(createOutput(inMsg, machineToInt(TRBP_NAME),
                                        messageToInt(TRBPOFF)));
-        _state = 7;
         return true;
     }
     else if (msg == COMMLOSS) {
         assert(src == TRBP_NAME);
         outMsgs.push_back(createOutput(inMsg, machineToInt(CRUISE_MERGE_NAME),
-                                       messageToInt(PILOT)));
+                                       messageToInt(RESET)));
         outMsgs.push_back(createOutput(inMsg, machineToInt(DRIVER_NAME),
                                        messageToInt(ABORT)));
-        _state = 7;
         return true;
     }
     else
@@ -373,7 +421,7 @@ void Merge::abortSeq(MessageTuple* inMsg, vector<MessageTuple*>& outMsgs)
     outMsgs.push_back(createOutput(inMsg, machineToInt(DRIVER_NAME),
                                    messageToInt(ABORT)));
     outMsgs.push_back(createOutput(inMsg, machineToInt(CRUISE_MERGE_NAME),
-                                   messageToInt(PILOT)));
+                                   messageToInt(RESET)));
     outMsgs.push_back(createOutput(inMsg, machineToInt(SENSOR_NAME),
                                    messageToInt(SENSOROFF)));
 }

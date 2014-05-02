@@ -67,6 +67,10 @@ int TRBP::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &hi
                 return 3;
             else if (msg == CLOCKFAIL) 
                 return 3;
+            else if (msg == TRBPOFF) {
+                assert(src == MERGE_NAME);
+                return 3;
+            }
             else
                 return -1;
             break;
