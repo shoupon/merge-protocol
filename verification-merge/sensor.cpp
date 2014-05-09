@@ -101,25 +101,26 @@ int Sensor::nullInputTrans(vector<MessageTuple *> &outMsgs, bool &high_prob, int
                 high_prob = false;
                 return 1;
             }
-            /*
-            else if( startIdx == 1) {
-                outMsgs.push_back(gapTaken("merge"));
-                outMsgs.push_back(gapTaken("front"));
-                outMsgs.push_back(gapTaken("back"));
+            else if (startIdx == 1) {
+                outMsgs.push_back(gapTaken(MERGE_NAME));
+                outMsgs.push_back(gapTaken(FRONT_NAME));
+                outMsgs.push_back(gapTaken(BACK_NAME));
+                _state = 0;
                 high_prob = false;
                 return 2;
             }
-            else if( startIdx == 2) {
-                outMsgs.push_back(loss("merge"));
-                outMsgs.push_back(loss("back"));
-                outMsgs.push_back(loss("front"));
+            else if (startIdx == 2) {
+                outMsgs.push_back(inconsistent(MERGE_NAME));
+                outMsgs.push_back(inconsistent(FRONT_NAME));
+                outMsgs.push_back(inconsistent(BACK_NAME));
+                _state = 0;
+                high_prob = false;
+                return 3;  
             }
-             */
             else {
                 return -1;
             }
             break;
-            
         default:
             return -1;
             break;
