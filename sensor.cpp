@@ -97,7 +97,6 @@ int Sensor::nullInputTrans(vector<MessageTuple *> &outMsgs, bool &high_prob,
         outMsgs.push_back(emergency(FRONT_NAME));
         outMsgs.push_back(emergency(BACK_NAME));
         _state = 0;
-        high_prob = false;
         return 1;
       }
       else if (startIdx == 1) {
@@ -105,7 +104,6 @@ int Sensor::nullInputTrans(vector<MessageTuple *> &outMsgs, bool &high_prob,
         outMsgs.push_back(gapTaken(FRONT_NAME));
         outMsgs.push_back(gapTaken(BACK_NAME));
         _state = 0;
-        high_prob = false;
         return 2;
       }
       else if (startIdx == 2) {
@@ -113,7 +111,6 @@ int Sensor::nullInputTrans(vector<MessageTuple *> &outMsgs, bool &high_prob,
         outMsgs.push_back(inconsistent(FRONT_NAME));
         outMsgs.push_back(inconsistent(BACK_NAME));
         _state = 0;
-        high_prob = false;
         return 3;  
       }
       else {
