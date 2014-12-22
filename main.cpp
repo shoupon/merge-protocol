@@ -12,7 +12,6 @@
 #include <stdexcept>
 using namespace std;
 
-#include "../prob_verify/parser.h"
 #include "../prob_verify/pverify.h"
 #include "../prob_verify/define.h"
 #include "../prob_verify/sync.h"
@@ -39,19 +38,18 @@ int nParty = nSlaves + 1;
 int main( int argc, char* argv[] )
 {
   try {
-    // Declare the names of component machines so as to register these names as id's in
-    // the parser
-    Parser* psrPtr = new Parser() ;
     // Create StateMachine objects
     // Add the state machines into ProbVerifier
     // Register the machines that are triggered by deadline (sync)
-    StateMachine::setLookup(psrPtr->getMsgTable(), psrPtr->getMacTable()) ;
-    Sync* sync = new Sync(nParty, psrPtr->getMsgTable(), psrPtr->getMacTable() );
+    unique_ptr<Lookup> message_lookup(new Lookup());
+    unique_ptr<Lookup> machine_lookup(new Lookup());
+    StateMachine::setLookup(message_lookup.get(), machine_lookup.get());
+    Sync* sync = new Sync(nParty, message_lookup.get(), machine_lookup.get() );
     pvObj.addMachine(sync);
     
-    Merge* merge = new Merge(psrPtr->getMsgTable(), psrPtr->getMacTable() );
-    Front* front = new Front(psrPtr->getMsgTable(), psrPtr->getMacTable() );
-    Back* back = new Back(psrPtr->getMsgTable(), psrPtr->getMacTable() );
+    Merge* merge = new Merge(message_lookup.get(), machine_lookup.get() );
+    Front* front = new Front(message_lookup.get(), machine_lookup.get() );
+    Back* back = new Back(message_lookup.get(), machine_lookup.get() );
     pvObj.addMachine(merge);
     pvObj.addMachine(front);
     pvObj.addMachine(back);
@@ -59,9 +57,9 @@ int main( int argc, char* argv[] )
     sync->addMachine(front);
     sync->addMachine(back);
     
-    Lock* lock0 = new Lock(psrPtr->getMsgTable(), psrPtr->getMacTable(), 0) ;
-    Lock* lock1 = new Lock(psrPtr->getMsgTable(), psrPtr->getMacTable(), 1) ;
-    Lock* lock2 = new Lock(psrPtr->getMsgTable(), psrPtr->getMacTable(), 2) ;
+    Lock* lock0 = new Lock(message_lookup.get(), machine_lookup.get(), 0) ;
+    Lock* lock1 = new Lock(message_lookup.get(), machine_lookup.get(), 1) ;
+    Lock* lock2 = new Lock(message_lookup.get(), machine_lookup.get(), 2) ;
     pvObj.addMachine(lock0);
     sync->addMachine(lock0);
     pvObj.addMachine(lock1);
@@ -69,15 +67,15 @@ int main( int argc, char* argv[] )
     pvObj.addMachine(lock2);
     sync->addMachine(lock2);
 
-    TRBP* trbp = new TRBP(psrPtr->getMsgTable(), psrPtr->getMacTable());
+    TRBP* trbp = new TRBP(message_lookup.get(), machine_lookup.get());
     pvObj.addMachine(trbp);
     sync->addMachine(trbp);
     
-    Cruise* iccm = new Cruise(psrPtr->getMsgTable(), psrPtr->getMacTable(),
+    Cruise* iccm = new Cruise(message_lookup.get(), machine_lookup.get(),
                               MERGE_NAME, "m", ALIGN);
-    Cruise* iccf = new Cruise(psrPtr->getMsgTable(), psrPtr->getMacTable(),
+    Cruise* iccf = new Cruise(message_lookup.get(), machine_lookup.get(),
                               FRONT_NAME, "f", MAINTAIN);
-    Cruise* iccb = new Cruise(psrPtr->getMsgTable(), psrPtr->getMacTable(),
+    Cruise* iccb = new Cruise(message_lookup.get(), machine_lookup.get(),
                               BACK_NAME, "b", MAKEGAP);
     pvObj.addMachine(iccm);
     pvObj.addMachine(iccf);
@@ -87,11 +85,11 @@ int main( int argc, char* argv[] )
     sync->addMachine(iccb);
     
     
-    Driver* driver = new Driver(psrPtr->getMsgTable(), psrPtr->getMacTable());
+    Driver* driver = new Driver(message_lookup.get(), machine_lookup.get());
     pvObj.addMachine(driver);
     sync->addMachine(driver);
 
-    Sensor* sensor = new Sensor(psrPtr->getMsgTable(), psrPtr->getMacTable());
+    Sensor* sensor = new Sensor(message_lookup.get(), machine_lookup.get());
     pvObj.addMachine(sensor);
     sync->addMachine(sensor);
     
@@ -128,7 +126,6 @@ int main( int argc, char* argv[] )
     
     // Specify the starting state
     GlobalState* startPoint = new GlobalState(pvObj.getMachinePtrs(), &mergeChkState);
-    startPoint->setParser(psrPtr);
     
     // Specify the global states in the set RS (stopping states)
     // initial state
@@ -363,7 +360,7 @@ int main( int argc, char* argv[] )
     
     // Start the procedure of probabilistic verification.
     // Specify the maximum probability depth to be explored
-    pvObj.start(10);
+    pvObj.start(10, 8);
     
     // When complete, deallocate all machines
     delete sync ;
@@ -379,9 +376,7 @@ int main( int argc, char* argv[] )
     delete trbp;
     
     delete startPoint;
-    
-    delete psrPtr;
-      
+
   } catch( runtime_error& re ) {
     cerr << "Runtime error:" << endl
          << re.what() << endl;
