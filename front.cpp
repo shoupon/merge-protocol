@@ -12,6 +12,7 @@
 Front::Front( Lookup* msg, Lookup* mac ):StateMachine(msg, mac)
 {
     setId(machineToInt(FRONT_NAME));
+    machine_name_ = FRONT_NAME;
     reset();
 }
 

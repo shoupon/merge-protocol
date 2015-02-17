@@ -11,6 +11,7 @@
 Sensor::Sensor(Lookup* msg, Lookup* mac):StateMachine(msg, mac)
 {
     setId(machineToInt(SENSOR_NAME)) ;
+    machine_name_ = SENSOR_NAME;
     reset();
 }
 

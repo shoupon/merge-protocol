@@ -16,6 +16,7 @@ Cruise::Cruise( Lookup* msg, Lookup* mac, string name, string abbv, string inst)
     stringstream ss;
     ss << "cruise(" << abbv << ")" ;
     setId(machineToInt(ss.str()));
+    machine_name_ = ss.str();
     reset();
 }
 

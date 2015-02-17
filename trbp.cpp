@@ -12,6 +12,7 @@
 TRBP::TRBP( Lookup* msg, Lookup* mac ):StateMachine(msg, mac)
 {
     setId(machineToInt(TRBP_NAME)) ;
+    machine_name_ = TRBP_NAME;
     reset();
 }
 

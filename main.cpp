@@ -358,9 +358,12 @@ int main( int argc, char* argv[] )
     err7c.addAllow(new StateSnapshot(2), 11);   // driver
     pvObj.addError(&err7c);
     
+    ProbVerifierConfig config;
+    config.setLowProbBound(0.1);
+    pvObj.configure(config);
     // Start the procedure of probabilistic verification.
     // Specify the maximum probability depth to be explored
-    pvObj.start(10, 8);
+    pvObj.start(10, startPoint);
     
     // When complete, deallocate all machines
     delete sync ;

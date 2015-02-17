@@ -65,7 +65,7 @@ public:
     
     size_t numParams() {return 1; }
     int getParam(size_t arg) { return 0; }
-    string toString() ;
+    string toString() const;
     LockMessage* clone() const ;
     
     string getBody() { return _body; }
@@ -79,14 +79,15 @@ public:
     friend class Lock;
     
     LockSnapshot(int state, int did, string purpose)
-    :StateSnapshot(state), _ss_did(did), _ss_purpose(purpose) {}
+        :StateSnapshot(state), _ss_purpose(purpose), _ss_did(did) {}
     
     ~LockSnapshot() {}
     // Returns the name of current state as specified in the input file
-    string toString() ;
+    string toString() const;
     // Cast the Snapshot into a integer. Used in HashTable
     int toInt() { return (_ss_state << 8) + (_ss_did << 4) + _ss_purpose.c_str()[0]; }
-    LockSnapshot* clone() const { return new LockSnapshot(_ss_state, _ss_did, _ss_purpose); }
+    LockSnapshot* clone() const { return new LockSnapshot(_ss_state, _ss_did,
+                                                          _ss_purpose); }
     
 private:
     string _ss_purpose;

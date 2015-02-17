@@ -12,6 +12,7 @@ Driver::Driver( Lookup* msg, Lookup* mac)
 :StateMachine(msg, mac)
 {
     setId(machineToInt(DRIVER_NAME));
+    machine_name_ = DRIVER_NAME;
     reset();
 }
 

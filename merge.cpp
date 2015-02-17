@@ -11,6 +11,7 @@
 Merge::Merge( Lookup* msg, Lookup* mac ): StateMachine(msg, mac)
 {
     setId(machineToInt(MERGE_NAME)) ;
+    machine_name_ = MERGE_NAME;
     reset() ;
 }
 

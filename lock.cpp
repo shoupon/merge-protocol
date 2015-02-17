@@ -16,6 +16,7 @@ Lock::Lock( Lookup* msg, Lookup* mac, int did )
     stringstream ss;
     ss << LOCK_NAME << "(" << did << ")";
     setId(machineToInt(ss.str()));
+    machine_name_ = ss.str();
     reset();
 }
 
@@ -181,7 +182,7 @@ MessageTuple* Lock::createSuccMsg()
     return msg;
 }
 
-string LockMessage::toString()
+string LockMessage::toString() const
 {
     stringstream ss;
     ss << MessageTuple::toString() << "(" << _body << ")" ;
@@ -193,7 +194,7 @@ LockMessage* LockMessage::clone() const
     return new LockMessage(*this);
 }
 
-string LockSnapshot::toString()
+string LockSnapshot::toString() const
 {
     stringstream ss;
     ss << _ss_state << "," << _ss_did << "(" << _ss_purpose << ")" ;

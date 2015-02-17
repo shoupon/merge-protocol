@@ -11,7 +11,8 @@
 Back::Back( Lookup* msg, Lookup* mac )
 :StateMachine(msg, mac)
 {
-    setId(machineToInt("back")) ;
+    setId(machineToInt(BACK_NAME)) ;
+    machine_name_ = BACK_NAME;
     reset() ;
 }
 
