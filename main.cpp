@@ -67,7 +67,7 @@ int main( int argc, char* argv[] )
     pvObj.addMachine(lock2);
     sync->addMachine(lock2);
 
-    TRBP* trbp = new TRBP(message_lookup.get(), machine_lookup.get());
+    TRBP* trbp = new TRBP();
     pvObj.addMachine(trbp);
     sync->addMachine(trbp);
     
@@ -247,6 +247,7 @@ int main( int argc, char* argv[] )
     end3clockb.addAllow(new StateSnapshot(4), 11) ;     // driver
     pvObj.addEND(&end3clockb);
 
+    /*
     // Driver is notified GREENLIGHT, but the gap is not ready yet
     StoppingState err1a(startPoint);
     err1a.addAllow(new StateSnapshot(2), 11);     // driver
@@ -275,11 +276,11 @@ int main( int argc, char* argv[] )
     err3a.addAllow(new StateSnapshot(0), 7);    // trbp
     err3a.addAllow(new StateSnapshot(1), 11);   // driver
     //pvObj.addError(&err3a);
-    
     StoppingState err3b(startPoint);
     err3b.addAllow(new StateSnapshot(0), 12);    // sensor
     err3b.addAllow(new StateSnapshot(2), 11);   // driver
     pvObj.addError(&err3b);
+    */
     
     // Driver is changing lanes but either the periodic update or the lock protocol
     // is not operating
