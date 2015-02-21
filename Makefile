@@ -20,11 +20,11 @@ SOURCES=main.cpp merge.cpp front.cpp back.cpp lock.cpp trbp.cpp cruise.cpp drive
 
 OBJECTS=$(SOURCES:.cpp=.o)
 
-EXECUTABLE=verifymerge
+EXECUTABLE=verify-merge
 
 # The 1st target gets build when typing "make"
 $(EXECUTABLE): $(OBJECTS) 
-	$(CXX) $(LDFLAGS) $(OBJECTS) $(LDLIBS) 
+	$(CXX) $(LDFLAGS) $(OBJECTS) $(LDLIBS) -o $(EXECUTABLE)
 
 .cpp.o:
 	$(CXX) -c $(CXXFLAGS) $< 
