@@ -13,15 +13,15 @@
 #include <iostream>
 #include <string>
 
+#include "../prob_verify/pverify.h"
 #include "../prob_verify/statemachine.h"
 #include "../prob_verify/sync.h"
 #include "identifiers.h"
-#include "lock.h"
+#include "merge.h"
 
-class TRBP: public StateMachine
-{
+class TRBP: public StateMachine {
 public:
-    TRBP( Lookup* msg, Lookup* mac );
+  TRBP();
     ~TRBP() {}
     int transit(MessageTuple* inMsg, vector<MessageTuple*>& outMsgs,
                 bool& high_prob, int startIdx = 0) ;
