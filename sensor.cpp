@@ -71,6 +71,9 @@ int Sensor::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs,
       else
         return -1;
       break;
+    case 3:
+      return 3;
+      break;
     default:
       return -1;
       break;
