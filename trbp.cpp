@@ -9,107 +9,70 @@
 #include "trbp.h"
 
 
-TRBP::TRBP( Lookup* msg, Lookup* mac ):StateMachine(msg, mac)
-{
-    setId(machineToInt(TRBP_NAME)) ;
-    machine_name_ = TRBP_NAME;
-    reset();
+TRBP::TRBP() {
+  setId(machineToInt(TRBP_NAME));
+  machine_name_ = TRBP_NAME;
+  reset();
 }
 
-int TRBP::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &high_prob,
-                      int startIdx)
-{
-    outMsgs.clear();
-    high_prob = true;
-    string msg = IntToMessage(inMsg->destMsgId());
-    string src = IntToMachine(inMsg->subjectId());
-    
-    if( startIdx != 0 )
-        return -1;
-    switch (_state) {
-        case 0:
-            if( msg == TRBPON ) {
-                assert(src == MERGE_NAME);
-                _state = 1;
-                return 3;
-            }
-            else if( msg == DEADLINE )
-                return 3;
-            else if (msg == CLOCKFAIL){
-                _state = 2;
-                return 3;
-            }
-            else
-                return -1;
-            break;
-        case 1:
-            if( msg == TRBPOFF ) {
-                assert(src == MERGE_NAME) ;
-                _state = 0 ;
-                return 3;
-            }
-            else if( msg == DEADLINE )
-                return 3;
-            else if (msg == CLOCKFAIL) {
-                outMsgs.push_back(loss(MERGE_NAME));
-                outMsgs.push_back(loss(FRONT_NAME));
-                outMsgs.push_back(loss(BACK_NAME));
-                outMsgs.push_back(createMsg(inMsg, SENSOR_NAME, TRBPFAIL));
-                _state = 2;
-                return 3;
-            }
-            else if (msg == REQUIRE)
-                return 3;
-            else
-                return -1;
-            break;
-        case 2:
-            if( msg == DEADLINE )
-                return 3;
-            else if (msg == CLOCKFAIL) 
-                return 3;
-            else if (msg == TRBPOFF) {
-                assert(src == MERGE_NAME);
-                return 3;
-            }
-            else
-                return -1;
-            break;
-        default:
-            return -1;
-            break;
+int TRBP::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs,
+                  bool &high_prob, int start_idx) {
+  outMsgs.clear();
+  high_prob = true;
+  if (start_idx)
+    return -1;
+
+  string msg = IntToMessage(inMsg->destMsgId());
+  string src = IntToMachine(inMsg->subjectId());
+  auto m_ptr = dynamic_cast<Merge*>(ProbVerifier::getMachine(MERGE_NAME));
+  auto f_ptr = dynamic_cast<Front*>(ProbVerifier::getMachine(FRONT_NAME));
+  auto b_ptr = dynamic_cast<Back*>(ProbVerifier::getMachine(BACK_NAME));
+  int m_state = m_ptr->getState();
+  int f_state = f_ptr->getState();
+  int b_state = b_ptr->getState();
+  if (!_state) {
+    if (msg == CLOCKFAIL) {
+      if (m_state >= 2 && m_state <= 6)
+        outMsgs.push_back(loss(MERGE_NAME));
+      if (f_state >= 1 && f_state <= 3)
+        outMsgs.push_back(loss(FRONT_NAME));
+      if (b_state >= 1 && b_state <= 3)
+        outMsgs.push_back(loss(BACK_NAME));
+      _state = 1;
+      return 3;
+    } else {
+      return 3;
     }
+  } else {
+    return 3;
+  }
+  return -1;
 }
 
-int TRBP::nullInputTrans(vector<MessageTuple *> &outMsgs, bool &high_prob, int startIdx)
-{
-    outMsgs.clear() ;
-    if( _state != 1 )
-        return -1;
-    high_prob = true;
-    switch (_state) {
-        case 0:
-        case 2:
-            return -1;
-        case 1:
-            if( startIdx == 0 ) {
-                outMsgs.push_back(loss(MERGE_NAME));
-                outMsgs.push_back(loss(FRONT_NAME));
-                outMsgs.push_back(loss(BACK_NAME));
-                outMsgs.push_back(createMsg(0, SENSOR_NAME, TRBPFAIL));
-                _state = 0;
-                high_prob = false;
-                return 10;
-            }
-            else {
-                return -1;
-            }
-            break;
-            
-        default:
-            return -1;
-            break;
+int TRBP::nullInputTrans(vector<MessageTuple *> &outMsgs,
+                         bool &high_prob, int startIdx) {
+  outMsgs.clear();
+  high_prob = true;
+  auto m_ptr = dynamic_cast<Merge*>(ProbVerifier::getMachine(MERGE_NAME));
+  auto f_ptr = dynamic_cast<Front*>(ProbVerifier::getMachine(FRONT_NAME));
+  auto b_ptr = dynamic_cast<Back*>(ProbVerifier::getMachine(BACK_NAME));
+  int m_state = m_ptr->getState();
+  int f_state = f_ptr->getState();
+  int b_state = b_ptr->getState();
+  if (!_state) {
+    if (!startIdx) {
+      high_prob = false;
+      if (m_state >= 2 && m_state <= 6)
+        outMsgs.push_back(loss(MERGE_NAME));
+      if (f_state >= 1 && f_state <= 3)
+        outMsgs.push_back(loss(FRONT_NAME));
+      if (b_state >= 1 && b_state <= 3)
+        outMsgs.push_back(loss(BACK_NAME));
+    } else {
+      return -1;
     }
+  }
+  return -1;
 }
 
 MessageTuple* TRBP::createMsg(MessageTuple *inMsg, const string& dest, string msg)

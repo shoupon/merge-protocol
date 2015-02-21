@@ -58,7 +58,8 @@ int Back::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &hi
                     return 3;
                 }
                 else
-                    return -1;
+                  assert(false);
+                  //  return -1;
             }
             else if( msg == COOPERATE ) {
                 assert(src == LOCK_1_NAME) ;
@@ -73,8 +74,7 @@ int Back::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &hi
             else if (msg == CLOCKFAIL) {
                 _state = 5;
                 return 3;
-            }
-            else if( msg == EMERGENCY ) {
+            } else if (msg == EMERGENCY || msg == GAPTAKEN || msg == INCONSISTENT) {
                 assert(src == SENSOR_NAME) ;
                 _state = 0;
                 return 3;
@@ -168,7 +168,7 @@ int Back::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &hi
 bool Back::isEmergency(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs) {
     string msg = IntToMessage(inMsg->destMsgId()) ;
     string src = IntToMachine(inMsg->subjectId()) ;
-    if( msg == EMERGENCY ) {
+    if (msg == EMERGENCY || msg == GAPTAKEN || msg == INCONSISTENT) {
         assert(src == SENSOR_NAME) ;
         outMsgs.push_back(new MessageTuple(inMsg->srcID(),
                                            machineToInt(CRUISE_BACK_NAME),

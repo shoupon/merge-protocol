@@ -66,8 +66,7 @@ int Front::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &h
                                                    macId()));
                 _state = 2;
                 return 3;
-            }
-            else if( msg == EMERGENCY ) {
+            } else if (msg == EMERGENCY || msg == GAPTAKEN || msg == INCONSISTENT) {
                 assert(src == SENSOR_NAME) ;
                 _state = 0;
                 return 3;
@@ -168,7 +167,7 @@ int Front::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &h
 bool Front::isEmergency(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs) {
     string msg = IntToMessage(inMsg->destMsgId()) ;
     string src = IntToMachine(inMsg->subjectId()) ;
-    if( msg == EMERGENCY ) {
+    if (msg == EMERGENCY || msg == GAPTAKEN || msg == INCONSISTENT) {
         assert(src == SENSOR_NAME) ;
         outMsgs.push_back(new MessageTuple(inMsg->srcID(),
                                            machineToInt(CRUISE_FRONT_NAME),

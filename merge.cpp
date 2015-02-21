@@ -62,8 +62,6 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs, bool &hi
                 assert(src == LOCK_0_NAME) ;
                 outMsgs.push_back(createSetMsg(inMsg, 1)) ;
                 outMsgs.push_back(createLockMsg(inMsg, CREATE, 1)) ;
-                outMsgs.push_back(createOutput(inMsg, machineToInt(TRBP_NAME),
-                                                  messageToInt(TRBPON)));
                 _state = 2;
                 return 3;
             }
@@ -105,8 +103,7 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs, bool &hi
                 assert(src == DRIVER_NAME) ;
                 _state = 8;
                 return 3;
-            }
-            else if( msg == EMERGENCY ) {
+            } else if (msg == EMERGENCY || msg == GAPTAKEN || msg == INCONSISTENT) {
                 assert(src == SENSOR_NAME) ;
                 outMsgs.push_back(createOutput(inMsg, machineToInt(DRIVER_NAME),
                                                messageToInt(ABORT)));
@@ -141,8 +138,6 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs, bool &hi
                                                messageToInt(ABORT))) ;
                 outMsgs.push_back(createOutput(inMsg, machineToInt(CRUISE_MERGE_NAME),
                                                messageToInt(RESET))) ;
-                outMsgs.push_back(createOutput(inMsg, machineToInt(TRBP_NAME),
-                                               messageToInt(TRBPOFF))) ;
                 outMsgs.push_back(createOutput(inMsg, machineToInt(SENSOR_NAME),
                                                messageToInt(SENSOROFF)));
                 _state = 0 ;
@@ -153,8 +148,7 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs, bool &hi
                 cancelSeq(inMsg, outMsgs);
                 _state = 8 ;
                 return 3;
-            }
-            else if( msg == EMERGENCY ) {
+            } else if (msg == EMERGENCY || msg == GAPTAKEN || msg == INCONSISTENT) {
                 assert(src == SENSOR_NAME) ;
                 outMsgs.push_back(createOutput(inMsg, machineToInt(CRUISE_MERGE_NAME),
                                                messageToInt(RESET)));
@@ -209,8 +203,7 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs, bool &hi
                                                messageToInt(SENSOROFF)));
                 _state = 7;
                 return 3;
-            }
-            else if( msg == EMERGENCY ) {
+            } else if (msg == EMERGENCY || msg == GAPTAKEN || msg == INCONSISTENT) {
                 assert(src == SENSOR_NAME) ;
                 outMsgs.push_back(createOutput(inMsg, machineToInt(CRUISE_MERGE_NAME),
                                                messageToInt(RESET)));
@@ -246,8 +239,6 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs, bool &hi
             else if( msg == DEADLINE ) {
                 int did = inMsg->getParam(1) ;
                 if(did == 2) {
-                    outMsgs.push_back(createOutput(inMsg, machineToInt(TRBP_NAME),
-                                                   messageToInt(TRBPOFF)));
                     outMsgs.push_back(createOutput(inMsg, machineToInt(DRIVER_NAME),
                                                    messageToInt(ABORT)));
                     outMsgs.push_back(createOutput(inMsg, machineToInt(CRUISE_MERGE_NAME),
@@ -259,8 +250,7 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs, bool &hi
                 }
                 else
                     return 3;
-            }
-            else if( msg == EMERGENCY ) {
+            } else if (msg == EMERGENCY || msg == GAPTAKEN || msg == INCONSISTENT) {
                 assert(src == SENSOR_NAME) ;
                 outMsgs.push_back(createOutput(inMsg, machineToInt(CRUISE_MERGE_NAME),
                                                messageToInt(RESET)));
@@ -287,8 +277,6 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs, bool &hi
             if( msg == DEADLINE ) {
                 int did = inMsg->getParam(1) ;
                 if(did == 2) {
-                    outMsgs.push_back(createOutput(inMsg, machineToInt(TRBP_NAME),
-                                                   messageToInt(TRBPOFF)));
                     _state = 0;
                     return 3;
                 }
@@ -317,8 +305,6 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs, bool &hi
             if (msg == DEADLINE) {
                 int did = inMsg->getParam(1) ;
                 if(did == 2) {
-                    outMsgs.push_back(createOutput(inMsg, machineToInt(TRBP_NAME),
-                                                   messageToInt(TRBPOFF)));
                     _state = 0;
                     return 3;
                 }
@@ -342,8 +328,6 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs, bool &hi
             if( msg == DEADLINE ) {
                 int did = inMsg->getParam(1) ;
                 if(did == 1) {
-                    outMsgs.push_back(createOutput(inMsg, machineToInt(TRBP_NAME),
-                                                   messageToInt(TRBPOFF)));
                     _state = 0;
                     return 3;
                 }
@@ -354,7 +338,7 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs, bool &hi
                 assert(src == LOCK_1_NAME) ;
                 return 3;
             }
-            else if (msg == EMERGENCY) {
+            else if (msg == EMERGENCY || msg == GAPTAKEN || msg == INCONSISTENT) {
                 assert(src == SENSOR_NAME);
                 return 3;
             }
@@ -393,14 +377,12 @@ int Merge::nullInputTrans(vector<MessageTuple *> &outMsgs, bool &high_prob, int 
 bool Merge::isEmergency(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs) {
     string msg = IntToMessage(inMsg->destMsgId()) ;
     string src = IntToMachine(inMsg->subjectId()) ;
-    if( msg == EMERGENCY ) {
+    if (msg == EMERGENCY || msg == GAPTAKEN || msg == INCONSISTENT) {
         assert(src == SENSOR_NAME) ;
         outMsgs.push_back(createOutput(inMsg, machineToInt(CRUISE_MERGE_NAME),
                                        messageToInt(RESET)));
         outMsgs.push_back(createOutput(inMsg, machineToInt(DRIVER_NAME),
                                        messageToInt(ABORT)));
-        outMsgs.push_back(createOutput(inMsg, machineToInt(TRBP_NAME),
-                                       messageToInt(TRBPOFF)));
         return true;
     }
     else if (msg == COMMLOSS) {
@@ -417,8 +399,6 @@ bool Merge::isEmergency(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs) {
 
 void Merge::abortSeq(MessageTuple* inMsg, vector<MessageTuple*>& outMsgs)
 {
-    outMsgs.push_back(createOutput(inMsg, machineToInt(TRBP_NAME),
-                                   messageToInt(TRBPOFF)));
     outMsgs.push_back(createOutput(inMsg, machineToInt(DRIVER_NAME),
                                    messageToInt(ABORT)));
     outMsgs.push_back(createOutput(inMsg, machineToInt(CRUISE_MERGE_NAME),
