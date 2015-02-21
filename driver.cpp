@@ -73,24 +73,30 @@ int Driver::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs,
     return -1;
 }
 
-int Driver::nullInputTrans(vector<MessageTuple *> &outMsgs, bool &high_prob, int startIdx)
-{
-    outMsgs.clear();
-    high_prob = true;
-    
-    if( startIdx != 0 )
+int Driver::nullInputTrans(vector<MessageTuple *> &outMsgs, bool &high_prob,
+                           int startIdx) {
+  outMsgs.clear();
+  high_prob = true;
+  if (startIdx)
+    return -1;
+
+  auto sync_ptr = dynamic_cast<Sync*>(ProbVerifier::getMachine(SYNC_NAME));
+  switch (_state) {
+    case 0:
+      if (sync_ptr->isAvailable(0) &&
+          sync_ptr->isAvailable(1) &&
+          sync_ptr->isAvailable(2)) {
+        outMsgs.push_back(new MessageTuple(0, machineToInt(MERGE_NAME),
+                                           0, messageToInt(SIGNAL), macId()));
+        outMsgs.push_back(new MessageTuple(0, machineToInt(CRUISE_MERGE_NAME),
+                                           0, messageToInt(REQUIRE), macId()));
+        _state = 1;
+        return 3;
+      } else {
         return -1;
-    
-    switch (_state) {
-        case 0:
-            outMsgs.push_back(new MessageTuple(0, machineToInt(MERGE_NAME),
-                                               0, messageToInt(SIGNAL), macId()));
-            outMsgs.push_back(new MessageTuple(0, machineToInt(CRUISE_MERGE_NAME),
-                                               0, messageToInt(REQUIRE), macId()));
-            _state = 1;
-            return 3;
-            break;
-        case 1:
+      }
+      break;
+    case 1:
             outMsgs.push_back(new MessageTuple(0, machineToInt(MERGE_NAME),
                                                0, messageToInt(CANCEL), macId()));
             _state = 0 ;
