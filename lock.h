@@ -13,23 +13,27 @@
 #include <sstream>
 using namespace std;
 
+#include "../prob_verify/pverify.h"
 #include "../prob_verify/statemachine.h"
 #include "../prob_verify/sync.h"
 #include "identifiers.h"
+#include "front.h"
+#include "back.h"
 
-
+class Front;
+class Back;
 class LockSnapshot;
 
 class Lock: public StateMachine
 {
     enum Role {Merge, Front, Back};
 public:
-    Lock( Lookup* msg, Lookup* mac, int did );
+    Lock(int did);
     ~Lock() {}
     int transit(MessageTuple* inMsg, vector<MessageTuple*>& outMsgs,
-                bool& high_prob, int startIdx = 0);
+                int& prob_level, int startIdx = 0);
     int nullInputTrans(vector<MessageTuple*>& outMsgs,
-                       bool& high_prob, int startIdx = 0);
+                       int& prob_level, int startIdx = 0);
     void restore(const StateSnapshot* snapshot);
     StateSnapshot* curState();
     void reset() { _purpose = "" ; _state = 0; }
@@ -52,7 +56,7 @@ public:
     LockMessage(int src, int dest, int srcMsg, int destMsg, int subject, string body)
     :MessageTuple(src, dest, srcMsg, destMsg, subject), _body(body){}
     
-    LockMessage( const LockMessage& msg )
+    LockMessage(const LockMessage& msg)
     :MessageTuple(msg._src, msg._dest, msg._srcMsg, msg._destMsg, msg._subject)
     , _body(msg._body) {}
     

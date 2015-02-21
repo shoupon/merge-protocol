@@ -57,9 +57,9 @@ int main( int argc, char* argv[] )
     sync->addMachine(front);
     sync->addMachine(back);
     
-    Lock* lock0 = new Lock(message_lookup.get(), machine_lookup.get(), 0) ;
-    Lock* lock1 = new Lock(message_lookup.get(), machine_lookup.get(), 1) ;
-    Lock* lock2 = new Lock(message_lookup.get(), machine_lookup.get(), 2) ;
+    Lock* lock0 = new Lock(0) ;
+    Lock* lock1 = new Lock(1) ;
+    Lock* lock2 = new Lock(2) ;
     pvObj.addMachine(lock0);
     sync->addMachine(lock0);
     pvObj.addMachine(lock1);
