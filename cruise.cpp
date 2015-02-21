@@ -44,6 +44,8 @@ int Cruise::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &
             else if (msg == REQUIRE) {
                 assert(src == DRIVER_NAME);
                 return 3;
+            } else if (msg == RESET) {
+              return 3;
             }
             else
                 return -1;
