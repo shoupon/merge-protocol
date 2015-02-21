@@ -25,7 +25,7 @@ public:
     int transit(MessageTuple* inMsg, vector<MessageTuple*>& outMsgs,
                 bool& high_prob, int startIdx = 0);
     int nullInputTrans(vector<MessageTuple*>& outMsgs,
-                       bool& high_prob, int startIdx = 0);
+                       int& prob_level, int startIdx = 0);
 private:
     MessageTuple* createMsg(MessageTuple* inMsg, const string& dest, string msg);
     MessageTuple* emergency(const string& dest);

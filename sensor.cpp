@@ -22,7 +22,7 @@ int Sensor::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs,
   string msg = IntToMessage(inMsg->destMsgId());
   string src = IntToMachine(inMsg->subjectId());
   
-  if( startIdx != 0 )
+  if (startIdx)
     return -1;
   switch (_state) {
     case 0:
@@ -75,19 +75,24 @@ int Sensor::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs,
       return -1;
       break;
   }
+  return -1;
 }
 
-int Sensor::nullInputTrans(vector<MessageTuple *> &outMsgs, bool &high_prob,
+int Sensor::nullInputTrans(vector<MessageTuple *> &outMsgs, int& prob_level,
                            int startIdx) {
   outMsgs.clear() ;
-  if( _state != 1 )
-    return -1;
-  high_prob = true;
+  prob_level = 0;
   switch (_state) {
     case 0:
-      return -1;
+      if (!startIdx) {
+        _state = 3;
+        prob_level = 4;
+        return 2;
+      } else {
+        return -1;
+      }
     case 1:
-      if( startIdx == 1 ) {
+      if (startIdx == 1) {
         outMsgs.push_back(createMsg(0, MERGE_NAME, GAPREADY));
         _state = 2;
         return 3;
@@ -99,6 +104,10 @@ int Sensor::nullInputTrans(vector<MessageTuple *> &outMsgs, bool &high_prob,
         outMsgs.push_back(emergency(BACK_NAME));
         _state = 0;
         return 1;
+      } else if (startIdx == 2) {
+        _state = 3;
+        prob_level = 4;
+        return 3;
       }
       else if (startIdx == 1) {
         outMsgs.push_back(gapTaken(MERGE_NAME));
@@ -107,12 +116,13 @@ int Sensor::nullInputTrans(vector<MessageTuple *> &outMsgs, bool &high_prob,
         _state = 0;
         return 2;
       }
-      else if (startIdx == 2) {
+      else if (startIdx == 3) {
         outMsgs.push_back(inconsistent(MERGE_NAME));
         outMsgs.push_back(inconsistent(FRONT_NAME));
         outMsgs.push_back(inconsistent(BACK_NAME));
+        prob_level = 2;
         _state = 0;
-        return 3;  
+        return 4;  
       }
       else {
         return -1;
