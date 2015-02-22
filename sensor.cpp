@@ -85,6 +85,12 @@ int Sensor::nullInputTrans(vector<MessageTuple *> &outMsgs, int& prob_level,
                            int startIdx) {
   outMsgs.clear() ;
   prob_level = 0;
+  auto m_ptr = dynamic_cast<Merge*>(ProbVerifier::getMachine(MERGE_NAME));
+  auto f_ptr = dynamic_cast<Front*>(ProbVerifier::getMachine(FRONT_NAME));
+  auto b_ptr = dynamic_cast<Back*>(ProbVerifier::getMachine(BACK_NAME));
+  int m_state = m_ptr->getState();
+  int f_state = f_ptr->getState();
+  int b_state = b_ptr->getState();
   switch (_state) {
     case 0:
       if (!startIdx) {
@@ -96,15 +102,19 @@ int Sensor::nullInputTrans(vector<MessageTuple *> &outMsgs, int& prob_level,
       }
     case 1:
       if (startIdx == 1) {
-        outMsgs.push_back(createMsg(0, MERGE_NAME, GAPREADY));
+        if (m_state == 3)
+          outMsgs.push_back(createMsg(0, MERGE_NAME, GAPREADY));
         _state = 2;
         return 3;
       }
     case 2:
       if (startIdx == 0) {
-        outMsgs.push_back(emergency(MERGE_NAME));
-        outMsgs.push_back(emergency(FRONT_NAME));
-        outMsgs.push_back(emergency(BACK_NAME));
+        if (m_state >= 3 && m_state <= 5)
+          outMsgs.push_back(emergency(MERGE_NAME));
+        if (f_state >= 2 && f_state <= 3)
+          outMsgs.push_back(emergency(FRONT_NAME));
+        if (b_state >= 2 && b_state <= 3)
+          outMsgs.push_back(emergency(BACK_NAME));
         _state = 0;
         return 1;
       } else if (startIdx == 2) {
@@ -113,16 +123,22 @@ int Sensor::nullInputTrans(vector<MessageTuple *> &outMsgs, int& prob_level,
         return 3;
       }
       else if (startIdx == 1) {
-        outMsgs.push_back(gapTaken(MERGE_NAME));
-        outMsgs.push_back(gapTaken(FRONT_NAME));
-        outMsgs.push_back(gapTaken(BACK_NAME));
+        if (m_state >= 3 && m_state <= 5)
+          outMsgs.push_back(gapTaken(MERGE_NAME));
+        if (f_state >= 2 && f_state <= 3)
+          outMsgs.push_back(gapTaken(FRONT_NAME));
+        if (b_state >= 2 && b_state <= 3)
+          outMsgs.push_back(gapTaken(BACK_NAME));
         _state = 0;
         return 2;
       }
       else if (startIdx == 3) {
-        outMsgs.push_back(inconsistent(MERGE_NAME));
-        outMsgs.push_back(inconsistent(FRONT_NAME));
-        outMsgs.push_back(inconsistent(BACK_NAME));
+        if (m_state >= 3 && m_state <= 5)
+          outMsgs.push_back(inconsistent(MERGE_NAME));
+        if (f_state >= 2 && f_state <= 3)
+          outMsgs.push_back(inconsistent(FRONT_NAME));
+        if (b_state >= 2 && b_state <= 3)
+          outMsgs.push_back(inconsistent(BACK_NAME));
         prob_level = 2;
         _state = 0;
         return 4;  

@@ -13,9 +13,17 @@
 #include <sstream>
 using namespace std;
 
+#include "../prob_verify/pverify.h"
 #include "../prob_verify/statemachine.h"
 #include "../prob_verify/sync.h"
 #include "identifiers.h"
+#include "merge.h"
+#include "front.h"
+#include "back.h"
+
+class Front;
+class Back;
+class Merge;
 
 class Sensor: public StateMachine
 {
