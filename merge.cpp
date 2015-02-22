@@ -92,8 +92,6 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs, bool &hi
             }
             else if( msg == SUCCESS ) {
                 assert(src == LOCK_1_NAME) ;
-                outMsgs.push_back(createOutput(inMsg, machineToInt(SENSOR_NAME),
-                                               messageToInt(SENSORON)));
                 outMsgs.push_back(createOutput(inMsg, machineToInt(CRUISE_MERGE_NAME),
                                                   messageToInt(ALIGN)));
                 _state = 3;
@@ -138,8 +136,6 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs, bool &hi
                                                messageToInt(ABORT))) ;
                 outMsgs.push_back(createOutput(inMsg, machineToInt(CRUISE_MERGE_NAME),
                                                messageToInt(RESET))) ;
-                outMsgs.push_back(createOutput(inMsg, machineToInt(SENSOR_NAME),
-                                               messageToInt(SENSOROFF)));
                 _state = 0 ;
                 return 3;
             }
@@ -187,8 +183,6 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs, bool &hi
                                                    messageToInt(ABORT)));   
                     outMsgs.push_back(createOutput(inMsg, machineToInt(CRUISE_MERGE_NAME),
                                                    messageToInt(RESET)));
-                    outMsgs.push_back(createOutput(inMsg, machineToInt(SENSOR_NAME),
-                                                   messageToInt(SENSOROFF)));
                     _state = 7;
                     return 3;
                 }
@@ -199,8 +193,6 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs, bool &hi
                 assert(src == DRIVER_NAME);
                 outMsgs.push_back(createOutput(inMsg, machineToInt(CRUISE_MERGE_NAME),
                                                messageToInt(RESET)));
-                outMsgs.push_back(createOutput(inMsg, machineToInt(SENSOR_NAME),
-                                               messageToInt(SENSOROFF)));
                 _state = 7;
                 return 3;
             } else if (msg == EMERGENCY || msg == GAPTAKEN || msg == INCONSISTENT) {
@@ -231,8 +223,6 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs, bool &hi
                 assert(src == DRIVER_NAME) ;
                 outMsgs.push_back(createOutput(inMsg, machineToInt(CRUISE_MERGE_NAME),
                                                messageToInt(RESET))) ;
-                outMsgs.push_back(createOutput(inMsg, machineToInt(SENSOR_NAME),
-                                               messageToInt(SENSOROFF)));
                 _state = 6 ;
                 return 3;
             }
@@ -243,8 +233,6 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs, bool &hi
                                                    messageToInt(ABORT)));
                     outMsgs.push_back(createOutput(inMsg, machineToInt(CRUISE_MERGE_NAME),
                                                    messageToInt(RESET)));
-                    outMsgs.push_back(createOutput(inMsg, machineToInt(SENSOR_NAME),
-                                                   messageToInt(SENSOROFF)));
                     _state = 0;
                     return 3;
                 }
@@ -403,16 +391,12 @@ void Merge::abortSeq(MessageTuple* inMsg, vector<MessageTuple*>& outMsgs)
                                    messageToInt(ABORT)));
     outMsgs.push_back(createOutput(inMsg, machineToInt(CRUISE_MERGE_NAME),
                                    messageToInt(RESET)));
-    outMsgs.push_back(createOutput(inMsg, machineToInt(SENSOR_NAME),
-                                   messageToInt(SENSOROFF)));
 }
 
 void Merge::cancelSeq(MessageTuple* inMsg, vector<MessageTuple*>& outMsgs)
 {
     outMsgs.push_back(createOutput(inMsg, machineToInt(CRUISE_MERGE_NAME),
                                    messageToInt(RESET)));
-    outMsgs.push_back(createOutput(inMsg, machineToInt(SENSOR_NAME),
-                                   messageToInt(SENSOROFF)));
 }
 
 MessageTuple* Merge::createOutput(MessageTuple* inMsg, int dest, int destMsg)

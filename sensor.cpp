@@ -19,66 +19,12 @@ int Sensor::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs,
                     bool &high_prob, int startIdx) {
   outMsgs.clear();
   high_prob = true;
-  string msg = IntToMessage(inMsg->destMsgId());
-  string src = IntToMachine(inMsg->subjectId());
   
-  if (startIdx)
+  if (startIdx) {
     return -1;
-  switch (_state) {
-    case 0:
-      if( msg == SENSORON ) {
-        assert(src == MERGE_NAME);
-        outMsgs.push_back(createMsg(inMsg, TRBP_NAME, REQUIRE));
-          _state = 1;
-          return 3;
-      }
-      else if( msg == DEADLINE )
-        return 3;
-      else if (msg == TRBPFAIL)
-        return 3;
-      else
-        return -1;
-      break;
-    case 1:
-      if( msg == SENSOROFF ) {
-        assert(src == MERGE_NAME) ;
-        _state = 0 ;
-        return 3;
-      }
-      else if (msg == TRBPFAIL) {
-        assert(src == TRBP_NAME);
-        _state = 0;
-        return 3;
-      }
-      else if( msg == DEADLINE )
-        return 3;
-      else
-        return -1;
-      break;
-    case 2:
-      if( msg == SENSOROFF ) {
-        assert(src == MERGE_NAME) ;
-        _state = 0 ;
-        return 3;
-      }
-      else if (msg == TRBPFAIL) {
-        assert(src == TRBP_NAME);
-        _state = 0;
-        return 3;
-      }
-      else if( msg == DEADLINE )
-        return 3;
-      else
-        return -1;
-      break;
-    case 3:
-      return 3;
-      break;
-    default:
-      return -1;
-      break;
+  } else {
+    return 3;
   }
-  return -1;
 }
 
 int Sensor::nullInputTrans(vector<MessageTuple *> &outMsgs, int& prob_level,
@@ -94,43 +40,31 @@ int Sensor::nullInputTrans(vector<MessageTuple *> &outMsgs, int& prob_level,
   switch (_state) {
     case 0:
       if (!startIdx) {
-        _state = 3;
-        prob_level = 4;
-        return 2;
-      } else {
-        return -1;
-      }
-    case 1:
-      if (startIdx == 1) {
-        if (m_state == 3)
+        if (m_state == 3) {
           outMsgs.push_back(createMsg(0, MERGE_NAME, GAPREADY));
-        _state = 2;
-        return 3;
-      }
-    case 2:
-      if (startIdx == 0) {
+          return 1;
+        } else {
+          goto events;
+        }
+      } else if (startIdx == 1) {
+events:
         if (m_state >= 3 && m_state <= 5)
           outMsgs.push_back(emergency(MERGE_NAME));
         if (f_state >= 2 && f_state <= 3)
           outMsgs.push_back(emergency(FRONT_NAME));
         if (b_state >= 2 && b_state <= 3)
           outMsgs.push_back(emergency(BACK_NAME));
-        _state = 0;
-        return 1;
+        if (outMsgs.empty())
+          return -1;
+        return 2;
       } else if (startIdx == 2) {
-        _state = 3;
-        prob_level = 4;
-        return 3;
-      }
-      else if (startIdx == 1) {
         if (m_state >= 3 && m_state <= 5)
           outMsgs.push_back(gapTaken(MERGE_NAME));
         if (f_state >= 2 && f_state <= 3)
           outMsgs.push_back(gapTaken(FRONT_NAME));
         if (b_state >= 2 && b_state <= 3)
           outMsgs.push_back(gapTaken(BACK_NAME));
-        _state = 0;
-        return 2;
+        return 3;
       }
       else if (startIdx == 3) {
         if (m_state >= 3 && m_state <= 5)
@@ -139,11 +73,14 @@ int Sensor::nullInputTrans(vector<MessageTuple *> &outMsgs, int& prob_level,
           outMsgs.push_back(inconsistent(FRONT_NAME));
         if (b_state >= 2 && b_state <= 3)
           outMsgs.push_back(inconsistent(BACK_NAME));
+        _state = 1;
         prob_level = 2;
-        _state = 0;
         return 4;  
-      }
-      else {
+      } else if (startIdx == 4) {
+        _state = 1;
+        prob_level = 4;
+        return 5;
+      } else {
         return -1;
       }
       break;
@@ -151,6 +88,7 @@ int Sensor::nullInputTrans(vector<MessageTuple *> &outMsgs, int& prob_level,
       return -1;
       break;
   }
+  return -1;
 }
 
 MessageTuple* Sensor::emergency(const string& dest) {
