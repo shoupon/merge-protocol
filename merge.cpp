@@ -15,111 +15,122 @@ Merge::Merge( Lookup* msg, Lookup* mac ): StateMachine(msg, mac)
     reset() ;
 }
 
-int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs, bool &high_prob,
-                   int startIdx)
-{
-    outMsgs.clear();
-    high_prob = true;
-    
-    if( startIdx != 0 )
-        return -1;
-    
-    string msg = IntToMessage(inMsg->destMsgId()) ;
-    string src = IntToMachine(inMsg->subjectId()) ;
-    switch (_state) {
-        case 0:
-            if( msg == SIGNAL ) {
-                assert(src == DRIVER_NAME ) ;
-                // Set D0
-                outMsgs.push_back(createSetMsg(inMsg, 0)) ;
-                outMsgs.push_back(createLockMsg(inMsg, REQUEST, 0));
-                _state = 1;
-                return 3;
-            }
-            else if (msg == SUCCESS) {
-                return 3;
-            }
-            else if (msg == CLOCKFAIL) {
-                assert(src == SYNC_NAME);
-                _state = 10;
-                return 3;
-            }
-            else if (msg == DEADLINE)
-                return 3;
-            else
-                return -1;
-            break ;
-        case 1:
-            if( msg == DEADLINE ) {
-                int did = inMsg->getParam(1) ;
-                assert(did == 0);
-                outMsgs.push_back(createOutput(inMsg, machineToInt(DRIVER_NAME),
-                                               messageToInt(ABORT)));
-                _state = 0;
-                return 3;
-            }
-            else if( msg == SUCCESS ) {
-                assert(src == LOCK_0_NAME) ;
-                outMsgs.push_back(createSetMsg(inMsg, 1)) ;
-                outMsgs.push_back(createLockMsg(inMsg, CREATE, 1)) ;
-                _state = 2;
-                return 3;
-            }
-            else if (msg == CLOCKFAIL) {
-                assert(src == SYNC_NAME);
-                _state = 10;
-                return 3;
-            }
-            else if( msg == CANCEL) {
-                assert(src == DRIVER_NAME) ;
-                _state = 0 ;
-                return 3;
-            }
-            else
-                return -1;
-            break;
-        case 2:
-            if( msg == DEADLINE ) {
-                int did = inMsg->getParam(1) ;
-                if( did == 1 || did == 0) {
-                    outMsgs.push_back(createOutput(inMsg, machineToInt(DRIVER_NAME),
-                                                   messageToInt(ABORT)));
-                    _state = 8;
-                    return 3;
-                }
-                else
-                    assert(false);
-            }
-            else if( msg == SUCCESS ) {
-                assert(src == LOCK_1_NAME) ;
-                outMsgs.push_back(createOutput(inMsg, machineToInt(CRUISE_MERGE_NAME),
-                                                  messageToInt(ALIGN)));
-                _state = 3;
-                return 3;
-            }
-            else if (msg == CANCEL) {
-                assert(src == DRIVER_NAME) ;
-                _state = 8;
-                return 3;
-            } else if (msg == EMERGENCY || msg == GAPTAKEN || msg == INCONSISTENT) {
-                assert(src == SENSOR_NAME) ;
-                outMsgs.push_back(createOutput(inMsg, machineToInt(DRIVER_NAME),
-                                               messageToInt(ABORT)));
-                _state = 8;
-                return 3;
-            }
-            else if (msg == COMMLOSS) {
-                assert(src == TRBP_NAME);
-                outMsgs.push_back(createOutput(inMsg, machineToInt(DRIVER_NAME),
-                                               messageToInt(ABORT)));
-                _state = 0;
-                return 3;
-            }
-            else if (msg == CLOCKFAIL)
-                return 3;
-            else
-                return 3;
-            break;
+int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs,
+                   bool &high_prob, int startIdx) {
+  outMsgs.clear();
+  high_prob = true;
+  if (startIdx)
+    return -1;
+  string msg = IntToMessage(inMsg->destMsgId()) ;
+  string src = IntToMachine(inMsg->subjectId()) ;
+  auto sensor_ptr = ProbVerifier::getMachine(SENSOR_NAME);
+  auto trbp_ptr = ProbVerifier::getMachine(TRBP_NAME);
+  switch (_state) {
+    case 0:
+        if( msg == SIGNAL ) {
+            assert(src == DRIVER_NAME ) ;
+            // Set D0
+            outMsgs.push_back(createSetMsg(inMsg, 0)) ;
+            outMsgs.push_back(createLockMsg(inMsg, REQUEST, 0));
+            _state = 1;
+            return 3;
+        }
+        else if (msg == SUCCESS) {
+            return 3;
+        }
+        else if (msg == CLOCKFAIL) {
+            assert(src == SYNC_NAME);
+            _state = 10;
+            return 3;
+        }
+        else if (msg == DEADLINE)
+            return 3;
+        else
+            return -1;
+          break ;
+    case 1:
+      if( msg == DEADLINE ) {
+          int did = inMsg->getParam(1) ;
+          assert(did == 0);
+          outMsgs.push_back(createOutput(inMsg, machineToInt(DRIVER_NAME),
+                                         messageToInt(ABORT)));
+          _state = 0;
+          return 3;
+      }
+      else if (msg == SUCCESS) {
+        assert(src == LOCK_0_NAME);
+        if (trbp_ptr->getState() == 1) {
+          outMsgs.push_back(createOutput(
+              inMsg, machineToInt(DRIVER_NAME), messageToInt(ABORT)));
+          _state = 0;
+        } else {
+          outMsgs.push_back(createSetMsg(inMsg, 1)) ;
+          outMsgs.push_back(createLockMsg(inMsg, CREATE, 1)) ;
+          _state = 2;
+        }
+        return 3;
+      }
+      else if (msg == CLOCKFAIL) {
+          assert(src == SYNC_NAME);
+          _state = 10;
+          return 3;
+      }
+      else if( msg == CANCEL) {
+          assert(src == DRIVER_NAME) ;
+          _state = 0 ;
+          return 3;
+      }
+      else
+          return -1;
+      break;
+    case 2:
+      if( msg == DEADLINE ) {
+          int did = inMsg->getParam(1) ;
+          if( did == 1 || did == 0) {
+              outMsgs.push_back(createOutput(inMsg, machineToInt(DRIVER_NAME),
+                                             messageToInt(ABORT)));
+              _state = 8;
+              return 3;
+          }
+          else
+              assert(false);
+      }
+      else if (msg == SUCCESS) {
+        assert(src == LOCK_1_NAME) ;
+        if (sensor_ptr->getState() == 1) {
+          outMsgs.push_back(createOutput(
+              inMsg, machineToInt(DRIVER_NAME), messageToInt(ABORT)));
+          _state = 0;
+        } else {
+          outMsgs.push_back(createOutput(
+              inMsg, machineToInt(CRUISE_MERGE_NAME), messageToInt(ALIGN)));
+          _state = 3;
+        }
+        return 3;
+      }
+      else if (msg == CANCEL) {
+          assert(src == DRIVER_NAME) ;
+          _state = 8;
+          return 3;
+      } else if (msg == EMERGENCY || msg == GAPTAKEN || msg == INCONSISTENT) {
+          assert(src == SENSOR_NAME) ;
+          outMsgs.push_back(createOutput(inMsg, machineToInt(DRIVER_NAME),
+                                         messageToInt(ABORT)));
+        _state = 8;
+        return 3;
+    }
+    else if (msg == COMMLOSS) {
+        assert(src == TRBP_NAME);
+        outMsgs.push_back(createOutput(inMsg, machineToInt(DRIVER_NAME),
+                                       messageToInt(ABORT)));
+        _state = 0;
+        return 3;
+    }
+    else if (msg == CLOCKFAIL)
+        return 3;
+    else
+        return 3;
+    break;
         case 3:
             if( msg == GAPREADY ) {
                 assert(src == SENSOR_NAME);

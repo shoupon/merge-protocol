@@ -27,6 +27,7 @@ int Front::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &h
     if( startIdx != 0 )
         return -1;
 
+    auto sensor_ptr = ProbVerifier::getMachine(SENSOR_NAME);
     switch (_state) {
         case 0:
             if( msg == COOPERATE ) {
@@ -59,12 +60,14 @@ int Front::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &h
             }
             else if( msg == COOPERATE ) {
                 assert(src == LOCK_1_NAME) ;
-                outMsgs.push_back(new MessageTuple(inMsg->srcID(),
-                                                   machineToInt(CRUISE_FRONT_NAME),
-                                                   inMsg->srcMsgId(),
-                                                   messageToInt(MAINTAIN),
-                                                   macId()));
-                _state = 2;
+                if (sensor_ptr->getState() == 1) {
+                  _state = 5;
+                } else {
+                  _state = 2;
+                  outMsgs.push_back(new MessageTuple(
+                      inMsg->srcID(), machineToInt(CRUISE_FRONT_NAME),
+                      inMsg->srcMsgId(), messageToInt(MAINTAIN), macId()));
+                }
                 return 3;
             } else if (msg == EMERGENCY || msg == GAPTAKEN || msg == INCONSISTENT) {
                 assert(src == SENSOR_NAME) ;

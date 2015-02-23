@@ -28,6 +28,7 @@ int Back::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &hi
     string msg = IntToMessage(inMsg->destMsgId()) ;
     string src = IntToMachine(inMsg->subjectId()) ;
 
+    auto sensor_ptr = ProbVerifier::getMachine(SENSOR_NAME);
     switch (_state) {
         case 0:
             if( msg == COOPERATE ) {
@@ -58,17 +59,18 @@ int Back::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &hi
                     return 3;
                 }
                 else
-                  assert(false);
-                  //  return -1;
+                    return -1;
             }
             else if( msg == COOPERATE ) {
                 assert(src == LOCK_1_NAME) ;
-                _state = 2;
-                outMsgs.push_back(new MessageTuple(inMsg->srcID(),
-                                                   machineToInt(CRUISE_BACK_NAME),
-                                                   inMsg->srcMsgId(),
-                                                   messageToInt(MAKEGAP),
-                                                   macId()));
+                if (sensor_ptr->getState() == 1) {
+                  _state = 5;
+                } else {
+                  _state = 2;
+                  outMsgs.push_back(new MessageTuple(
+                      inMsg->srcID(), machineToInt(CRUISE_BACK_NAME),
+                      inMsg->srcMsgId(), messageToInt(MAKEGAP), macId()));
+                }
                 return 3;
             }
             else if (msg == CLOCKFAIL) {
