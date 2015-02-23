@@ -32,8 +32,8 @@ bool EmergencyChecker::check(CheckerState* checker_state,
       return false;
   }
 
-  // If sensor fails, merge shouldn't be in state 2, 3, 4, 5, 6
-  //                  front shouldn't be in state 1, 2, 3
+  // If sensor fails, merge shouldn't be in state 3, 4, 5
+  //                  front shouldn't be in state 2, 3
   //                  back  ...
   if (sensor_state == 1 || sensor_state == 2) {
     if (m_state >= 3 && m_state <= 5)
