@@ -25,10 +25,15 @@ class Front;
 class Back;
 class Merge;
 
+/*
+ * State 0: normal
+ * State 1: detected failure or fatal failure
+ * State 2: undesirable events on roadway
+ */
 class Sensor: public StateMachine
 {
 public:
-    Sensor( Lookup* msg, Lookup* mac );
+    Sensor();
     ~Sensor() {}
     int transit(MessageTuple* inMsg, vector<MessageTuple*>& outMsgs,
                 bool& high_prob, int startIdx = 0);

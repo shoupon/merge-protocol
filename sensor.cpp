@@ -8,11 +8,10 @@
 
 #include "sensor.h"
 
-Sensor::Sensor(Lookup* msg, Lookup* mac):StateMachine(msg, mac)
-{
-    setId(machineToInt(SENSOR_NAME)) ;
-    machine_name_ = SENSOR_NAME;
-    reset();
+Sensor::Sensor() {
+  setId(machineToInt(SENSOR_NAME)) ;
+  machine_name_ = SENSOR_NAME;
+  reset();
 }
 
 int Sensor::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs,
@@ -56,6 +55,8 @@ events:
           outMsgs.push_back(emergency(BACK_NAME));
         if (outMsgs.empty())
           return -1;
+        else
+          _state = 2;
         return 2;
       } else if (startIdx == 2) {
         if (m_state >= 3 && m_state <= 5)
@@ -64,6 +65,7 @@ events:
           outMsgs.push_back(gapTaken(FRONT_NAME));
         if (b_state >= 2 && b_state <= 3)
           outMsgs.push_back(gapTaken(BACK_NAME));
+        _state = 2;
         return 3;
       }
       else if (startIdx == 3) {

@@ -27,7 +27,7 @@ using namespace std;
 #include "driver.h"
 #include "sensor.h"
 
-#include "mergechecker.h"
+#include "emergency-checker.h"
 
 ProbVerifier pvObj ;
 GlobalState* startPoint;
@@ -89,16 +89,18 @@ int main( int argc, char* argv[] )
     pvObj.addMachine(driver);
     sync->addMachine(driver);
 
-    Sensor* sensor = new Sensor(message_lookup.get(), machine_lookup.get());
+    Sensor* sensor = new Sensor();
     pvObj.addMachine(sensor);
     sync->addMachine(sensor);
     
     // Initialize SecureChecker
-    MergeChecker mergeChk;
-    MergeCheckerState mergeChkState;
+    EmergencyChecker emergency_checker(
+        trbp->macId() - 1, sensor->macId() - 1,
+        merge->macId() - 1, front->macId() - 1, back->macId() - 1);
+    CheckerState checker_state;
     
     // Add checker into ProbVerifier
-    pvObj.addChecker(&mergeChk);
+    pvObj.addChecker(&emergency_checker);
 
     // Create group of processes that are linked to the same timing stack
     // (Group of processes that located within same agent)
@@ -125,7 +127,8 @@ int main( int argc, char* argv[] )
     GlobalState::setService(srvc);
     
     // Specify the starting state
-    GlobalState* startPoint = new GlobalState(pvObj.getMachinePtrs(), &mergeChkState);
+    GlobalState* startPoint = new GlobalState(pvObj.getMachinePtrs(),
+                                              &checker_state);
     
     // Specify the global states in the set RS (stopping states)
     // initial state
@@ -154,7 +157,6 @@ int main( int argc, char* argv[] )
     stop2.addAllow(new StateSnapshot(3), 2) ;      // front
     stop2.addAllow(new StateSnapshot(3), 3) ;      // back
     stop2.addAllow(new LockSnapshot(5,2,MOVE), 6) ; // lock 2
-    stop2.addAllow(new StateSnapshot(1), 7) ;      // trbp
     stop2.addAllow(new StateSnapshot(1), 8) ;      // icc merge
     stop2.addAllow(new StateSnapshot(1), 9) ;      // icc front
     stop2.addAllow(new StateSnapshot(1), 10) ;     // icc back
@@ -183,7 +185,7 @@ int main( int argc, char* argv[] )
     stopclockfail1a.addProhibit(new StateSnapshot(1), 10) ;     // icc back
     stopclockfail1a.addAllow(new StateSnapshot(4), 11) ;     // driver
     pvObj.addSTOP(&stopclockfail1a);
-    
+
     StoppingState stopclockfail2(startPoint);
     //stopclockfail2.addAllow(new StateSnapshot(7), 1) ;      // merge
     stopclockfail2.addAllow(new StateSnapshot(5), 2) ;      // front

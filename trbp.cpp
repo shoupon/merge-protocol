@@ -68,6 +68,7 @@ int TRBP::nullInputTrans(vector<MessageTuple *> &outMsgs,
         outMsgs.push_back(loss(FRONT_NAME));
       if (b_state >= 1 && b_state <= 3)
         outMsgs.push_back(loss(BACK_NAME));
+      _state = 1;
     } else {
       return -1;
     }
