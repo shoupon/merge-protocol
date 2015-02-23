@@ -44,7 +44,7 @@ int main( int argc, char* argv[] )
     unique_ptr<Lookup> message_lookup(new Lookup());
     unique_ptr<Lookup> machine_lookup(new Lookup());
     StateMachine::setLookup(message_lookup.get(), machine_lookup.get());
-    Sync* sync = new Sync(nParty, message_lookup.get(), machine_lookup.get() );
+    Sync* sync = new Sync(nParty, 3, 6);
     pvObj.addMachine(sync);
     
     Merge* merge = new Merge(message_lookup.get(), machine_lookup.get() );
