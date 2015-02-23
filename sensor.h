@@ -27,8 +27,9 @@ class Merge;
 
 /*
  * State 0: normal
- * State 1: detected failure or fatal failure
- * State 2: undesirable events on roadway
+ * State 1: detected failure
+ * State 2: fatal failure
+ * State 3: undesirable events on roadway
  */
 class Sensor: public StateMachine
 {

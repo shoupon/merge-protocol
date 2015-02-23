@@ -47,16 +47,8 @@ int Sensor::nullInputTrans(vector<MessageTuple *> &outMsgs, int& prob_level,
         }
       } else if (startIdx == 1) {
 events:
-        if (m_state >= 3 && m_state <= 5)
-          outMsgs.push_back(emergency(MERGE_NAME));
-        if (f_state >= 2 && f_state <= 3)
-          outMsgs.push_back(emergency(FRONT_NAME));
-        if (b_state >= 2 && b_state <= 3)
-          outMsgs.push_back(emergency(BACK_NAME));
-        if (outMsgs.empty())
-          return -1;
-        else
-          _state = 2;
+        _state = 2;
+        prob_level = 4;
         return 2;
       } else if (startIdx == 2) {
         if (m_state >= 3 && m_state <= 5)
@@ -65,22 +57,28 @@ events:
           outMsgs.push_back(gapTaken(FRONT_NAME));
         if (b_state >= 2 && b_state <= 3)
           outMsgs.push_back(gapTaken(BACK_NAME));
-        _state = 2;
+        _state = 3;
         return 3;
-      }
-      else if (startIdx == 3) {
+      } else if (startIdx == 3) {
         if (m_state >= 3 && m_state <= 5)
           outMsgs.push_back(inconsistent(MERGE_NAME));
-        if (f_state >= 2 && f_state <= 3)
+        if (f_state >= 1 && f_state <= 3)
           outMsgs.push_back(inconsistent(FRONT_NAME));
-        if (b_state >= 2 && b_state <= 3)
+        if (b_state >= 1 && b_state <= 3)
           outMsgs.push_back(inconsistent(BACK_NAME));
-        _state = 1;
+        if (outMsgs.empty())
+          return -1;
+        else
+          _state = 1;
         prob_level = 2;
         return 4;  
       } else if (startIdx == 4) {
-        _state = 1;
-        prob_level = 4;
+        if (m_state >= 3 && m_state <= 5)
+          outMsgs.push_back(emergency(MERGE_NAME));
+        if (f_state >= 1 && f_state <= 3)
+          outMsgs.push_back(emergency(FRONT_NAME));
+        if (b_state >= 1 && b_state <= 3)
+          outMsgs.push_back(emergency(BACK_NAME));
         return 5;
       } else {
         return -1;
