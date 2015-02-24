@@ -82,9 +82,13 @@ int Driver::nullInputTrans(vector<MessageTuple *> &outMsgs, bool &high_prob,
 
   auto sync_ptr = dynamic_cast<Sync*>(ProbVerifier::getMachine(SYNC_NAME));
   auto m_ptr = ProbVerifier::getMachine(MERGE_NAME);
+  auto sensor_ptr = ProbVerifier::getMachine(SENSOR_NAME);
+  auto trbp_ptr = ProbVerifier::getMachine(TRBP_NAME);
   switch (_state) {
     case 0:
       if (m_ptr->getState() == 0 &&
+          sensor_ptr->getState() != 1 && sensor_ptr->getState() != 3 &&
+          trbp_ptr->getState() != 1 &&
           sync_ptr->isAvailable(0) &&
           sync_ptr->isAvailable(1) &&
           sync_ptr->isAvailable(2)) {
