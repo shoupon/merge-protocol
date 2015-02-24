@@ -40,7 +40,7 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs,
         }
         else if (msg == CLOCKFAIL) {
             assert(src == SYNC_NAME);
-            _state = 10;
+            _state = 0;
             return 3;
         }
         else if (msg == DEADLINE)
@@ -72,7 +72,7 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs,
       }
       else if (msg == CLOCKFAIL) {
           assert(src == SYNC_NAME);
-          _state = 10;
+          _state = 0;
           return 3;
       }
       else if( msg == CANCEL) {
@@ -351,16 +351,6 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs,
             else
                 return -1;
             break ;
-        case 10:
-            if( isEmergency(inMsg, outMsgs) ){
-                return 3;
-            }
-            else if (msg == SUCCESS) {
-                return 3;
-            }
-            else
-                return -1;
-            break;
         default:
             return -1;
             break;
