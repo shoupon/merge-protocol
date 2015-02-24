@@ -28,12 +28,15 @@ int Front::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &h
         return -1;
 
     auto sensor_ptr = ProbVerifier::getMachine(SENSOR_NAME);
+    auto trbp_ptr = ProbVerifier::getMachine(TRBP_NAME);
     switch (_state) {
         case 0:
             if( msg == COOPERATE ) {
-                if(src != LOCK_0_NAME) 
-                    return -1;
-                _state = 1;
+                if (trbp_ptr->getState() == 1) {
+                  _state = 5;
+                } else {
+                  _state = 1;
+                }
                 return 3;
             }
             else if( isEmergency(inMsg, outMsgs) ) {
@@ -156,6 +159,8 @@ int Front::transit(MessageTuple *inMsg, vector<MessageTuple *> &outMsgs, bool &h
             if (msg == COMMLOSS) {
                 assert(src == TRBP_NAME);
                 return 3;
+            } else if (msg == DEADLINE || msg == CLOCKFAIL) {
+              return 3;
             }
             else
                 return -1;
