@@ -194,7 +194,7 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs,
                                                    messageToInt(ABORT)));   
                     outMsgs.push_back(createOutput(inMsg, machineToInt(CRUISE_MERGE_NAME),
                                                    messageToInt(RESET)));
-                    _state = 7;
+                    _state = 0;
                     return 3;
                 }
                 else
@@ -204,7 +204,7 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs,
                 assert(src == DRIVER_NAME);
                 outMsgs.push_back(createOutput(inMsg, machineToInt(CRUISE_MERGE_NAME),
                                                messageToInt(RESET)));
-                _state = 7;
+                _state = 0;
                 return 3;
             } else if (msg == EMERGENCY || msg == GAPTAKEN || msg == INCONSISTENT) {
                 assert(src == SENSOR_NAME) ;
@@ -212,7 +212,7 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs,
                                                messageToInt(RESET)));
                 outMsgs.push_back(createOutput(inMsg, machineToInt(DRIVER_NAME),
                                                messageToInt(ABORT)));
-                _state = 7;
+                _state = 0;
                 return 3;
             }
             else if (msg == COMMLOSS) {
@@ -255,7 +255,7 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs,
                                                messageToInt(RESET)));
                 outMsgs.push_back(createOutput(inMsg, machineToInt(DRIVER_NAME),
                                                messageToInt(ABORT)));
-                _state = 7;
+                _state = 0;
                 return 3;
             }
             else if (msg == COMMLOSS) {
@@ -265,29 +265,6 @@ int Merge::transit(MessageTuple *inMsg, vector<MessageTuple*> &outMsgs,
                 outMsgs.push_back(createOutput(inMsg, machineToInt(DRIVER_NAME),
                                                messageToInt(ABORT)));
                 _state = 0;
-                return 3;
-            }
-            else if (msg == CLOCKFAIL)
-                return 3;
-            else
-                return -1;
-            break;
-        case 7:
-            if (msg == DEADLINE) {
-                int did = inMsg->getParam(1) ;
-                if(did == 2) {
-                    _state = 0;
-                    return 3;
-                }
-                return 3;
-            }
-            else if (msg == COMMLOSS) {
-                assert(src == TRBP_NAME);
-                _state = 0;
-                return 3;
-            }
-            else if (msg == SUCCESS) {
-                assert(src == LOCK_1_NAME || src == LOCK_2_NAME);
                 return 3;
             }
             else if (msg == CLOCKFAIL)
