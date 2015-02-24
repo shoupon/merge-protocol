@@ -16,7 +16,9 @@ LDFLAGS = -g
 # -lm for the math library
 LDLIBS = -L../prob_verify -lpverify
 
-SOURCES=main.cpp merge.cpp front.cpp back.cpp lock.cpp trbp.cpp cruise.cpp driver.cpp sensor.cpp mergechecker.cpp
+FSMS = merge.cpp front.cpp back.cpp driver.cpp
+INTERFACES = lock.cpp trbp.cpp cruise.cpp sensor.cpp
+SOURCES = main.cpp emergency-checker.cpp $(FSMS) $(INTERFACES)
 
 OBJECTS=$(SOURCES:.cpp=.o)
 
@@ -31,7 +33,7 @@ $(EXECUTABLE): $(OBJECTS)
 
 .PHONY: clean
 clean:
-	rm -f *.o *.a *.gch a.out core verifymerge
+	rm -f *.o *.a *.gch a.out core $(EXECUTABLE)
 
 .PHONY: all
 all: clean $(EXECUTABLE)
