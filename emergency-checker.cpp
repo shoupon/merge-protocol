@@ -7,6 +7,22 @@
 //
 
 #include "emergency-checker.h"
+int getPosition(const string& name) {
+  return ProbVerifier::getMachine(name)->macId() - 1;
+}
+
+EmergencyChecker::EmergencyChecker()
+      : trbp_pos_(getPosition(TRBP_NAME)),
+        sensor_pos_(getPosition(SENSOR_NAME)),
+        driver_pos_(getPosition(DRIVER_NAME)),
+        merge_pos_(getPosition(MERGE_NAME)),
+        front_pos_(getPosition(FRONT_NAME)),
+        back_pos_(getPosition(BACK_NAME)),
+        cc_merge_pos_(getPosition(CRUISE_MERGE_NAME)),
+        cc_front_pos_(getPosition(CRUISE_FRONT_NAME)),
+        cc_back_pos_(getPosition(CRUISE_BACK_NAME)) {
+  ;
+}
 
 bool EmergencyChecker::check(CheckerState* checker_state,
                              const vector<StateSnapshot*>& machine_states) {
