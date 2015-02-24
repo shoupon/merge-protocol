@@ -52,15 +52,6 @@ events:
         return 2;
       } else if (startIdx == 2) {
         if (m_state >= 3 && m_state <= 5)
-          outMsgs.push_back(gapTaken(MERGE_NAME));
-        if (f_state >= 2 && f_state <= 3)
-          outMsgs.push_back(gapTaken(FRONT_NAME));
-        if (b_state >= 2 && b_state <= 3)
-          outMsgs.push_back(gapTaken(BACK_NAME));
-        _state = 3;
-        return 3;
-      } else if (startIdx == 3) {
-        if (m_state >= 3 && m_state <= 5)
           outMsgs.push_back(inconsistent(MERGE_NAME));
         if (f_state >= 1 && f_state <= 3)
           outMsgs.push_back(inconsistent(FRONT_NAME));
@@ -71,17 +62,27 @@ events:
         else
           _state = 1;
         prob_level = 2;
-        return 4;  
-      } else if (startIdx == 4) {
+        return 3;
+      } else if (startIdx == 3) {
         if (m_state >= 3 && m_state <= 5)
           outMsgs.push_back(emergency(MERGE_NAME));
         if (f_state >= 1 && f_state <= 3)
           outMsgs.push_back(emergency(FRONT_NAME));
         if (b_state >= 1 && b_state <= 3)
           outMsgs.push_back(emergency(BACK_NAME));
+        return 4;
+      } else if (startIdx == 4) {
+        if (m_state >= 3 && m_state <= 5)
+          outMsgs.push_back(gapTaken(MERGE_NAME));
+        if (f_state >= 2 && f_state <= 3)
+          outMsgs.push_back(gapTaken(FRONT_NAME));
+        if (b_state >= 2 && b_state <= 3)
+          outMsgs.push_back(gapTaken(BACK_NAME));
+        if (outMsgs.empty())
+          return -1;
+        else
+          _state = 3;
         return 5;
-      } else {
-        return -1;
       }
       break;
     default:
