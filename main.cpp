@@ -94,9 +94,7 @@ int main( int argc, char* argv[] )
     sync->addMachine(sensor);
     
     // Initialize SecureChecker
-    EmergencyChecker emergency_checker(
-        trbp->macId() - 1, sensor->macId() - 1,
-        merge->macId() - 1, front->macId() - 1, back->macId() - 1);
+    EmergencyChecker emergency_checker;
     CheckerState checker_state;
     
     // Add checker into ProbVerifier
@@ -317,11 +315,11 @@ int main( int argc, char* argv[] )
     pvObj.addError(&err7c);
     
     ProbVerifierConfig config;
-    config.setLowProbBound(0.1);
+    config.setLowProbBound(0.0001);
     pvObj.configure(config);
     // Start the procedure of probabilistic verification.
     // Specify the maximum probability depth to be explored
-    pvObj.start(10, startPoint);
+    pvObj.start(3, startPoint);
     
     // When complete, deallocate all machines
     delete sync ;
