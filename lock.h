@@ -54,10 +54,10 @@ public:
     // "complete", which is to notify the controller that the lock is released, the field
     // is used to tell the controller which competitor this lock was associated to
     LockMessage(int src, int dest, int srcMsg, int destMsg, int subject, string body)
-    :MessageTuple(src, dest, srcMsg, destMsg, subject), _body(body){}
+    :MessageTuple(dest, destMsg, subject), _body(body){}
     
     LockMessage(const LockMessage& msg)
-    :MessageTuple(msg._src, msg._dest, msg._srcMsg, msg._destMsg, msg._subject)
+    :MessageTuple(msg._dest, msg._destMsg, msg._subject)
     , _body(msg._body) {}
     
     LockMessage(int src, int dest, int srcMsg, int destMsg, int subject,
